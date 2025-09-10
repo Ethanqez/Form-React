@@ -222,7 +222,7 @@ const handleChange = (e) => {
 
             <label htmlFor="fechaNacimiento">Fecha De Nacimiento</label>
             <input type="date" value={nacimiento} onChange={(txt)=>{
-              setNacimiento(txt.target.value) //funca o no funca?, funca, ahora ando viendo algo con my parnet, busca como mostrar tablas mapear listas o arrays, x lo q tpidio leando es eso, practicamnete algo senicllito, bueno, ia voi
+              setNacimiento(txt.target.value) 
             }}/>
 
             <label htmlFor="pais">Pais</label>
