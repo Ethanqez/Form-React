@@ -93,38 +93,40 @@ function App() {
     <div>
       <h2>DETALLE DE MARCACIONES</h2>
 
-      {/* Contenedor que centra la parte de arriba */}
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-        <div className="contenedor" style={{ display: "flex", justifyContent: "center" }}>
-          <div className="grupo" style={{ margin: "10px" }}>
-            <h1 style={{ fontSize: "14px" }}>Fecha Inicial</h1>
-            <input type='date' ref={fechaI} style={{ width: "280px", height: "14px" }} />
-          </div>
-
-          <div className="grupo" style={{ margin: "10px" }}>
-            <h1 style={{ fontSize: "14px" }}>Fecha Final</h1>
-            <input type='date' ref={fechaF} style={{ width: "280px", height: "14px" }} />
-          </div>
+      <div className="contenedor">
+        <div className="grupo">
+            <h1 style={{fontSize: "14px"}}>Fecha Inicial</h1>
+            <input type='date'
+            ref={fechaI} style={{width: "280px", height: "14px"}}/>
         </div>
 
-        <h1 style={{ fontSize: "14px" }}>Empleado</h1>
-        <input type='text' onChange={handleChange} style={{ width: "400px", height: "14px" }} />
+        <div className="grupo">
+            <h1 style={{fontSize: "14px"}}>Fecha Final</h1>
+            <input type='date'
+            ref={fechaF} style={{width: "280px", height: "14px"}}/>
+        </div>
       </div>
 
-      <br /><br />
+      <h1 style={{fontSize: "14px"}}>Empleado</h1>
+            <input type='text'
+            onChange={handleChange} style={{width: "400px", height: "14px"}}/>
 
-      {/* Contenedor para centrar el botón */}
+      <br></br>
+
       <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
         <input className="boton" type='button' value="Mostrar Marcaciones"
           style={{ height: "50px", textAlign: 'center', fontSize: "14px", margin: "17px", width: "150px" }} />
       </div>
 
-      <DataTable
-        columns={columns}
-        data={registro}
-        fixedHeader
-        fixedHeaderScrollHeight="500px"
-      />
+      {/* Contenedor que centra la tabla */}
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginTop: "20px" }}>
+        <DataTable 
+          columns={columns} 
+          data={registro} 
+          fixedHeader
+          fixedHeaderScrollHeight="500px"
+        />
+      </div>
     </div>
   );
 }
