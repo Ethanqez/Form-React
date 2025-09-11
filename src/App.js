@@ -2,57 +2,23 @@ import './App.css';
 import { useState, useRef, Component } from 'react';
 import axios from 'axios';
 import DataTable from 'react-data-table-component';
+import jsPDF from 'jspdf'; 
+import html2canvas from 'html2canvas'; 
 
 function App() {
   const columns = [
-    {
-      name: <b>Fecha</b>,
-      selector: row => row.fecha,
-      sortable: true
-    },
-    {
-      name: <b>Día</b>,
-      selector: row => row.dia
-    },
-    {
-      name: <b>H01</b>,
-      selector: row => row.h01,
-    },
-    {
-      name: <b>H02</b>,
-      selector: row => row.h02,
-    },
-    {
-      name: <b>H03</b>,
-      selector: row => row.h03,
-    },
-    {
-      name: <b>H04</b>,
-      selector: row => row.h04,
-    },
-    {
-      name: <b>H05</b>,
-      selector: row => row.h05,
-    },
-    {
-      name: <b>H06</b>,
-      selector: row => row.h06,
-    },
-    {
-      name: <b>H07</b>,
-      selector: row => row.h07,
-    },
-    {
-      name: <b>H08</b>,
-      selector: row => row.h08,
-    },
-    {
-      name: <b>TOTAL (Horas)</b>,
-      selector: row => row.total,
-    },
-    {
-      name: <b>Empleado</b>,
-      selector: row => row.empleado,
+    { name: <b>Fecha</b>, selector: row => row.fecha, sortable: true },
+    { name: <b>Día</b>, selector: row => row.dia },
+    { name: <b>H01</b>, selector: row => row.h01 },
+    { name: <b>H02</b>, selector: row => row.h02 },
+    { name: <b>H03</b>, selector: row => row.h03 },
+    { name: <b>H04</b>, selector: row => row.h04 },
+    { name: <b>H05</b>, selector: row => row.h05 },
+    { name: <b>H06</b>, selector: row => row.h06 },
+    { name: <b>H07</b>, selector: row => row.h07 },
+    { name: <b>H08</b>, selector: row => row.h08 },
+    { name: <b>TOTAL (Horas)</b>, selector: row => row.total },
+    { name: <b>Empleado</b>, selector: row => row.empleado, 
       cell: row => (
         <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
           {row.empleado.split(" ").map((palabra, i) => (
@@ -106,46 +72,60 @@ function App() {
     
   //}
 
-  }
+  };
+
+  // Función para generar el PDF con todo 
+  const handleGeneratePDF = () => {
+    const input = document.getElementById('content');
+    const button = document.getElementById('generate-pdf-btn'); 
+    button.style.display = 'none'; 
+
+    html2canvas(input, { scale: 2 }).then(canvas => { 
+      const imgData = canvas.toDataURL('image/png');
+      const doc = new jsPDF('landscape'); 
+      doc.addImage(imgData, 'PNG', 10, 10, 280, 150); 
+      doc.save('marcaciones.pdf'); 
+
+      button.style.display = 'block'; //mostrar botón
+    });
+  };
 
   return (
-    <div>
+    <div id="content">
       <h2>DETALLE DE MARCACIONES</h2>
-
+      
       <div className="contenedor">
         <div className="grupo">
-            <h1 style={{fontSize: "14px"}}>Fecha Inicial</h1>
-            <input type='date'
-            ref={fechaI} style={{width: "280px", height: "30px"}}/>
+          <h1 style={{fontSize: "14px"}}>Fecha Inicial</h1>
+          <input type='date' ref={fechaI} style={{width: "280px", height: "30px"}}/>
         </div>
-
         <div className="grupo">
-            <h1 style={{fontSize: "14px"}}>Fecha Final</h1>
-            <input type='date'
-            ref={fechaF} style={{width: "280px", height: "30px"}}/>
+          <h1 style={{fontSize: "14px"}}>Fecha Final</h1>
+          <input type='date' ref={fechaF} style={{width: "280px", height: "30px"}}/>
         </div>
       </div>
-
-      <br></br>
-
+      <br/>
       <h1 style={{fontSize: "14px"}}>Empleado</h1>
-            <input type='text'
-            onChange={handleChange} style={{width: "600px", height: "30px"}}/>
-
-      <br></br>
-
+      <input type='text' onChange={handleChange} style={{width: "600px", height: "30px"}}/>
+      <br/>
       <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-        <input className="boton" type='button' value="Mostrar Marcaciones"
-          style={{ height: "40px", textAlign: 'center', fontSize: "14px", margin: "17px", width: "177px" }} />
+        <input className="boton" type='button' value="Mostrar Marcaciones" style={{ height: "40px", textAlign: 'center', fontSize: "14px", margin: "17px", width: "177px" }} />
       </div>
 
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginTop: "20px" }}>
-        <DataTable 
-          columns={columns} 
-          data={registro} 
-          fixedHeader
-          fixedHeaderScrollHeight="500px"
-        />
+      {/* Se renderiza la tabla */}
+      <div id="data-table" style={{ display: "flex", justifyContent: "center", alignItems: "center", marginTop: "20px" }}>
+        <DataTable columns={columns} data={registro} fixedHeader fixedHeaderScrollHeight="500px" />
+      </div>
+
+      {/* Botón para generar PDF debajo de la tabla */}
+      <div style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}>
+        <button
+          id="generate-pdf-btn"
+          onClick={handleGeneratePDF}
+          style={{ padding: "10px 20px", fontSize: "14px" }}
+        >
+          Generar PDF
+        </button>
       </div>
     </div>
   );
