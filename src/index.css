@@ -17,11 +17,42 @@ label {
   display: block;
 }
 
-input {
-  width: 100%;
-}
-
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+h2 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 15px;
+  padding: 7px;
+}
+
+.contenedor {
+  display: flex;
+  justify-content: space-between;
+  gap: 650px; 
+}
+
+.grupo {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+input {
+  padding: 8px;
+  font-size: 16px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.boton{
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   margin-top: 17px;
+}
+
