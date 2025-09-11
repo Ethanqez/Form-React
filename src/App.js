@@ -1,5 +1,5 @@
 import './App.css';
-import { useState, useRef } from 'react';
+import { useState, useRef, Component } from 'react';
 import axios from 'axios';
 import DataTable from 'react-data-table-component';
 
@@ -64,19 +64,30 @@ function App() {
   ];
 
   const data = [
-    { fecha: <b>30/07/2025</b>, dia: "Miércoles", h01: "08:00", h02: "10:00", h03: "11:00", h04: "13:00", total: "05:00", empleado: "LOOR HURTADO LUIS ANTONIO" },
-    { fecha: <b>30/06/2025</b>, dia: "Lunes", h01: "14:22", h02: "16:00", h03: "17:15", total: "03:00", empleado: "MONRROY ZAMBRANO IZAN MANUEL" },
-    { fecha: <b>30/04/2025</b>, dia: "Miércoles", h01: "18:00", h02: "20:00", h03: "21:00", h04: "22:00", total: "04:00", empleado: "ORDÓÑEZ GASPAR FRANKLIN JESSIEL" },
-    { fecha: <b>01/08/2025</b>, dia: "Viernes", h01: "09:15", h02: "11:30", h03: "12:30", h04: "14:00", total: "04:45", empleado: "MARTÍNEZ PÉREZ JUAN CARLOS" },
-    { fecha: <b>02/08/2025</b>, dia: "Sábado", h01: "14:00", h02: "16:00", h03: "17:00", h04: "18:00", h05: "19:00", total: "05:00", empleado: "GÓMEZ RAMÍREZ LAURA SOFÍA" },
-    { fecha: <b>03/08/2025</b>, dia: "Domingo", h01: "11:30", h02: "13:45", h03: "15:00", h04: "16:00", h05: "17:30", total: "06:00", empleado: "PÉREZ MENDOZA JULIO ALBERTO" },
-    { fecha: <b>04/08/2025</b>, dia: "Lunes", h01: "10:00", h02: "12:15", h03: "13:30", h04: "15:00", total: "05:15", empleado: "SÁNCHEZ FERNÁNDEZ ANDREA LUISA" },
-    { fecha: <b>05/08/2025</b>, dia: "Martes", h01: "08:45", h02: "10:55", h03: "12:00", h04: "13:15", h05: "14:30", total: "05:45", empleado: "JIMÉNEZ GARCÍA SARA PAOLA" },
-    { fecha: <b>06/08/2025</b>, dia: "Miércoles", h01: "16:30", h02: "18:30", h03: "19:30", h04: "21:00", total: "04:30", empleado: "CASTRO SERRANO FRANCISCO JUAN" },
-    { fecha: <b>07/08/2025</b>, dia: "Jueves", h01: "13:00", h02: "15:00", h03: "16:30", h04: "18:00", h05: "19:15", total: "06:15", empleado: "RODRÍGUEZ TORO MARÍA VICTORIA" },
-    { fecha: <b>08/08/2025</b>, dia: "Viernes", h01: "19:45", h02: "21:50", h03: "22:30", total: "03:45", empleado: "LOPEZ DÍAZ FRANCISCO JAVIER" },
-    { fecha: <b>09/08/2025</b>, dia: "Sábado", h01: "12:00", h02: "14:10", h03: "15:30", h04: "17:00", h05: "18:20", total: "06:20", empleado: "MORALES HERRERA EDUARDO ENRIQUE" },
-    { fecha: <b>10/08/2025</b>, dia: "Domingo", h01: "17:30", h02: "19:30", h03: "20:45", h04: "22:00", total: "04:30", empleado: "RIVERA CASTAÑO VERÓNICA LISBETH" }
+  { fecha: <b>12/08/2025</b>, dia: "Martes", h01: "08:30", h02: "10:45", h03: "11:50", h04: "13:00", h05: "14:15", total: "05:45", empleado: "FUENTES MORALES CAMILA ALEJANDRA" },
+  { fecha: <b>13/08/2025</b>, dia: "Miércoles", h01: "14:50", h02: "17:10", h03: "18:20", total: "03:30", empleado: "VILLALOBOS GIL JOSÉ LUIS" },
+  { fecha: <b>15/08/2025</b>, dia: "Viernes", h01: "13:45", h02: "16:00", h03: "17:20", h04: "18:35", total: "04:50", empleado: "VILLALOBOS GIL JOSÉ LUIS" },
+  { fecha: <b>14/08/2025</b>, dia: "Jueves", h01: "08:15", h02: "10:30", h03: "11:40", h04: "13:00", h05: "14:10", total: "05:00", empleado: "FUENTES MORALES CAMILA ALEJANDRA" },
+  { fecha: <b>14/08/2025</b>, dia: "Jueves", h01: "09:50", h02: "12:00", h04: "14:30", total: "04:00", empleado: "SALAZAR VÉLEZ RICARDO ANDRÉS" },
+  { fecha: <b>13/08/2025</b>, dia: "Miércoles", h01: "09:15", h02: "11:20", h03: "12:35", h04: "14:00", total: "04:45", empleado: "NAVARRO CARRILLO ANA BELÉN" },
+  { fecha: <b>16/08/2025</b>, dia: "Sábado", h01: "08:45", h02: "10:50", h03: "12:05", h05: "13:30", total: "04:45", empleado: "NAVARRO CARRILLO ANA BELÉN" },
+  { fecha: <b>13/08/2025</b>, dia: "Miércoles", h01: "15:00", h02: "17:15", h03: "18:30", h04: "19:45", total: "04:45", empleado: "DELGADO SUÁREZ LUIS MIGUEL" },
+  { fecha: <b>16/08/2025</b>, dia: "Sábado", h01: "11:10", h02: "13:25", h03: "14:40", h04: "15:50", total: "04:40", empleado: "SALAZAR VÉLEZ RICARDO ANDRÉS" },
+  { fecha: <b>17/08/2025</b>, dia: "Domingo", h01: "10:45", h02: "13:00", h03: "14:15", h04: "15:30", total: "04:45", empleado: "SALAZAR VÉLEZ RICARDO ANDRÉS" },
+  { fecha: <b>12/08/2025</b>, dia: "Martes", h01: "07:45", h02: "10:00", h03: "11:15", h04: "12:30", total: "04:45", empleado: "CÓRDOVA PÉREZ MARÍA FERNANDA" },
+  { fecha: <b>17/08/2025</b>, dia: "Domingo", h01: "08:00", h02: "10:10", h03: "11:25", h04: "12:40", h05: "13:50", total: "05:30", empleado: "FUENTES MORALES CAMILA ALEJANDRA" },
+  { fecha: <b>14/08/2025</b>, dia: "Jueves", h01: "15:30", h02: "17:40", h03: "19:00", h04: "20:15", total: "04:45", empleado: "VILLALOBOS GIL JOSÉ LUIS" },
+  { fecha: <b>13/08/2025</b>, dia: "Miércoles", h01: "11:00", h02: "13:15", h03: "14:30", h04: "15:45", h05: "16:50", total: "05:45", empleado: "SALAZAR VÉLEZ RICARDO ANDRÉS" },
+  { fecha: <b>15/08/2025</b>, dia: "Viernes", h01: "10:20", h02: "12:35", h04: "15:00", total: "03:40", empleado: "SALAZAR VÉLEZ RICARDO ANDRÉS" },
+  { fecha: <b>16/08/2025</b>, dia: "Sábado", h01: "15:20", h02: "17:30", h03: "18:50", h04: "20:10", total: "04:50", empleado: "DELGADO SUÁREZ LUIS MIGUEL" },
+  { fecha: <b>12/08/2025</b>, dia: "Martes", h01: "10:15", h02: "12:30", h03: "13:45", h04: "15:00", h05: "16:00", total: "05:45", empleado: "SALAZAR VÉLEZ RICARDO ANDRÉS" },
+  { fecha: <b>15/08/2025</b>, dia: "Viernes", h01: "07:50", h02: "10:00", h03: "11:20", h04: "12:30", total: "04:40", empleado: "CÓRDOVA PÉREZ MARÍA FERNANDA" },
+  { fecha: <b>13/08/2025</b>, dia: "Miércoles", h01: "08:00", h02: "10:15", h03: "11:30", h04: "13:00", h05: "14:10", total: "05:30", empleado: "CÓRDOVA PÉREZ MARÍA FERNANDA" },
+  { fecha: <b>14/08/2025</b>, dia: "Jueves", h01: "09:10", h02: "11:20", h03: "12:40", total: "03:30", empleado: "CÓRDOVA PÉREZ MARÍA FERNANDA" },
+  { fecha: <b>17/08/2025</b>, dia: "Domingo", h01: "09:00", h02: "11:00", h03: "12:15", h04: "13:30", total: "04:30", empleado: "CÓRDOVA PÉREZ MARÍA FERNANDA" },
+  { fecha: <b>12/08/2025</b>, dia: "Martes", h01: "14:30", h02: "16:45", h03: "18:00", h04: "19:15", total: "04:45", empleado: "DELGADO SUÁREZ LUIS MIGUEL" },
+  { fecha: <b>14/08/2025</b>, dia: "Jueves", h01: "08:50", h02: "10:55", h03: "12:10", h04: "13:30", total: "04:40", empleado: "NAVARRO CARRILLO ANA BELÉN" },
+  { fecha: <b>15/08/2025</b>, dia: "Viernes", h01: "09:30", h02: "11:35", h03: "12:50", h04: "14:10", h05: "15:30", total: "06:00", empleado: "NAVARRO CARRILLO ANA BELÉN" }
   ];
 
   const [registro, setRegistro] = useState(data);
@@ -88,6 +99,13 @@ function App() {
       return registro.empleado.toLowerCase().includes(e.target.value.toLowerCase());
     });
     setRegistro(datosFiltrados);
+
+  //ComponentDidMount(){
+    //axios.get("");
+    //then(Response=>{console.log(Response)}).catch(error=>{console.log(error)});
+    
+  //}
+
   }
 
   return (
