@@ -3,6 +3,7 @@ import { useState, useRef } from 'react';
 import DataTable from 'react-data-table-component';
 import jsPDF from 'jspdf'; 
 import html2canvas from 'html2canvas'; 
+import Select from 'react-select';
 
 function App() {
   const columns = [
@@ -41,7 +42,7 @@ function App() {
     },
   ];
 
-  // Nuevo array unificado
+  // nuevo array unificado
   const empleados = [
     {
       nombre: "FUENTES MORALES CAMILA ALEJANDRA",
@@ -193,19 +194,23 @@ function App() {
       </div>
       <br/>
 
-      <div>
-        <h1 style={{ fontSize: "14px" }}>Empleado</h1>
-        <select
-          onChange={handleChange}
-          style={{ width: "600px", height: "30px" }}>
-          <option value=""></option>
-          {empleados.map((emp, index) => (
-            <option key={index} value={emp.nombre}>
-              {emp.nombre}
-            </option>
-          ))}
-        </select>
-      </div>
+
+<div>
+  <h1 style={{ fontSize: "14px" }}>Empleado</h1>
+  <div style={{ width: "600px", zIndex: 999, position: 'relative' }}>
+    <Select
+      options={empleados.map(emp => ({ value: emp.nombre, label: emp.nombre }))}
+      onChange={option => handleChange({ target: { value: option ? option.value : '' } })}
+      placeholder="Seleccione un empleado"
+      isClearable
+      styles={{
+        menu: (provided) => ({ ...provided, zIndex: 1000 }) 
+      }}
+    />
+  </div>
+</div>
+
+
 
       <br/>
       <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
