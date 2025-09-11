@@ -1,6 +1,5 @@
 import './App.css';
-import { useState, useRef, Component } from 'react';
-import axios from 'axios';
+import { useState, useRef } from 'react';
 import DataTable from 'react-data-table-component';
 import jsPDF from 'jspdf'; 
 import html2canvas from 'html2canvas'; 
@@ -56,6 +55,17 @@ function App() {
   { fecha: <b>15/08/2025</b>, dia: "Viernes", h01: "09:30", h02: "11:35", h03: "12:50", h04: "14:10", h05: "15:30", total: "06:00", empleado: "NAVARRO CARRILLO ANA BELÉN" }
   ];
 
+
+  const empleados = [
+    "FUENTES MORALES CAMILA ALEJANDRA" ,
+    "VILLALOBOS GIL JOSÉ LUIS" ,
+    "SALAZAR VÉLEZ RICARDO ANDRÉS" ,
+    "NAVARRO CARRILLO ANA BELÉN",
+    "DELGADO SUÁREZ LUIS MIGUEL" ,
+    "CÓRDOVA PÉREZ MARÍA FERNANDA" 
+  ];
+
+  const [selectEmpleado, setSelectEmpleado] = useState(data);
   const [registro, setRegistro] = useState(data);
   const fechaI = useRef();
   const fechaF = useRef();
@@ -66,15 +76,15 @@ function App() {
     });
     setRegistro(datosFiltrados);
 
-  //ComponentDidMount(){
-    //axios.get("");
-    //then(Response=>{console.log(Response)}).catch(error=>{console.log(error)});
+    setSelectEmpleado(e.target.value);
+    console.log("Empleado seleccionado:", e.target.value);
     
-  //}
-
   };
 
-  // Función para generar el PDF con todo 
+
+
+
+
   const handleGeneratePDF = () => {
     const input = document.getElementById('content');
     const button = document.getElementById('generate-pdf-btn'); 
@@ -86,39 +96,57 @@ function App() {
       doc.addImage(imgData, 'PNG', 10, 10, 280, 150); 
       doc.save('marcaciones.pdf'); 
 
-      button.style.display = 'block'; //mostrar botón
+      button.style.display = 'block';
     });
   };
 
   return (
     <div id="content">
       <h2>DETALLE DE MARCACIONES</h2>
-      
       <div className="contenedor">
+
         <div className="grupo">
           <h1 style={{fontSize: "14px"}}>Fecha Inicial</h1>
           <input type='date' ref={fechaI} style={{width: "280px", height: "30px"}}/>
         </div>
+
         <div className="grupo">
           <h1 style={{fontSize: "14px"}}>Fecha Final</h1>
           <input type='date' ref={fechaF} style={{width: "280px", height: "30px"}}/>
         </div>
+
       </div>
       <br/>
-      <h1 style={{fontSize: "14px"}}>Empleado</h1>
-      <input type='text' onChange={handleChange} style={{width: "600px", height: "30px"}}/>
+
+      <div>
+        <h1 style={{ fontSize: "14px" }}>Empleado</h1>
+        <select
+          value={selectEmpleado}
+          onChange={handleChange}
+          
+          style={{ width: "600px", height: "30px" }}>
+
+        <option value="">Seleccione un empleado</option>
+        {empleados.map((nombre, index) => (
+          <option key={index} value={nombre}>
+            {nombre}
+          </option>
+        ))}
+      </select>
+    </div>
+
+
       <br/>
       <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
         <input className="boton" type='button' value="Mostrar Marcaciones" style={{ height: "40px", textAlign: 'center', fontSize: "14px", margin: "17px", width: "177px" }} />
       </div>
 
-      {/* Se renderiza la tabla */}
       <div id="data-table" style={{ display: "flex", justifyContent: "center", alignItems: "center", marginTop: "20px" }}>
         <DataTable columns={columns} data={registro} fixedHeader fixedHeaderScrollHeight="500px" />
       </div>
 
-      {/* Botón para generar PDF debajo de la tabla */}
       <div style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}>
+
         <button
           id="generate-pdf-btn"
           onClick={handleGeneratePDF}
