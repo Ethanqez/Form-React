@@ -1,6 +1,5 @@
-import logo from './logo.svg';
 import './App.css';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import DataTable from 'react-data-table-component';
 
 function App() {
@@ -163,7 +162,7 @@ const data = [
 ]
 
 const [registro, setRegistro] = useState(data)
-const [resetear] = useState(false)
+
 
 const handleChange = (e) => {
   const datosFiltrados = data.filter(registro =>{
@@ -172,8 +171,17 @@ const handleChange = (e) => {
   setRegistro(datosFiltrados)
 }
 
+const fechaI = useRef();
+/*const fechaF = useRef();*/
+
+
   return (
     <div>
+      <h1>Fecha Inicial</h1>
+      <input type='date'
+        ref={fechaI}
+      />
+      <h1>Empleado</h1>
       <input type='text'
         onChange={handleChange}      
       />
