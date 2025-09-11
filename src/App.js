@@ -223,7 +223,7 @@ const fechaI = useRef();
         onChange={handleChange}      
       />
       <DataTable 
-        title="Mostrar Macaciones"
+        title="Mostrar Marcaciones"
         columns={columns} 
         data={registro} 
         fixedHeader
