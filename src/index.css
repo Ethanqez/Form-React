@@ -33,7 +33,7 @@ h2 {
 .contenedor {
   display: flex;
   justify-content: space-between;
-  gap: 650px; 
+  gap: 670px; 
 }
 
 .grupo {
@@ -50,9 +50,9 @@ input {
 }
 
 .boton{
-   display: flex;
-   justify-content: center;
-   align-items: center;
-   margin-top: 17px;
+   background-color: white;
+   border-color: rgba(0, 0, 0, 0.525);
+   color:rgba(0, 0, 0, 0.438);
+   border-radius: 5px;
 }
 

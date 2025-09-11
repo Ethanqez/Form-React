@@ -1,5 +1,6 @@
 import './App.css';
 import { useState, useRef } from 'react';
+import axios from 'axios';
 import DataTable from 'react-data-table-component';
 
 function App() {
@@ -97,28 +98,29 @@ function App() {
         <div className="grupo">
             <h1 style={{fontSize: "14px"}}>Fecha Inicial</h1>
             <input type='date'
-            ref={fechaI} style={{width: "280px", height: "14px"}}/>
+            ref={fechaI} style={{width: "280px", height: "30px"}}/>
         </div>
 
         <div className="grupo">
             <h1 style={{fontSize: "14px"}}>Fecha Final</h1>
             <input type='date'
-            ref={fechaF} style={{width: "280px", height: "14px"}}/>
+            ref={fechaF} style={{width: "280px", height: "30px"}}/>
         </div>
       </div>
 
+      <br></br>
+
       <h1 style={{fontSize: "14px"}}>Empleado</h1>
             <input type='text'
-            onChange={handleChange} style={{width: "400px", height: "14px"}}/>
+            onChange={handleChange} style={{width: "600px", height: "30px"}}/>
 
       <br></br>
 
       <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
         <input className="boton" type='button' value="Mostrar Marcaciones"
-          style={{ height: "50px", textAlign: 'center', fontSize: "14px", margin: "17px", width: "150px" }} />
+          style={{ height: "40px", textAlign: 'center', fontSize: "14px", margin: "17px", width: "177px" }} />
       </div>
 
-      {/* Contenedor que centra la tabla */}
       <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginTop: "20px" }}>
         <DataTable 
           columns={columns} 
