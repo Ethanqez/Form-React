@@ -11,6 +11,7 @@
     "react-data-table-component": "^7.7.0",
     "react-dom": "^19.1.1",
     "react-scripts": "5.0.1",
+    "react-table-component": "^0.9.8",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
