@@ -3,7 +3,16 @@ import { useState, useRef } from 'react';
 import DataTable from 'react-data-table-component';
 import jsPDF from 'jspdf'; 
 import html2canvas from 'html2canvas'; 
-import Select from 'react-select';
+import {
+  CButton,
+  CCard,
+  CCardBody,
+  CCardHeader,
+  CFormSelect,
+  CContainer,
+  CRow,
+  CCol,
+} from '@coreui/react';
 
 function App() {
   const columns = [
@@ -166,49 +175,25 @@ function App() {
     });
   };
 
-  return (
-    <div id="content">
-      <h2>DETALLE DE MARCACIONES</h2>
-      <div className="contenedor">
+return (
+    <CContainer id="content" className="py-5">
+      <CCard className="shadow-lg border-0">
+        <CCardHeader className="text-white" style={{ background: 'linear-gradient(90deg, #2193b0, #6dd5ed)' }}>
+          <h2 className="m-0 text-center">DETALLE DE MARCACIONES</h2>
+        </CCardHeader>
+        <CCardBody style={{ backgroundColor: '#f0f8ff' }}>
 
-        <div className="grupo">
-          <h1 style={{fontSize: "14px"}}>Fecha Inicial</h1>
-          <input 
-            type='date' 
-            ref={fechaI} 
-            onChange={handleFilterByDate}
-            style={{width: "280px", height: "40px"}}
-          />
-        </div>
-
-        <div className="grupo">
-          <h1 style={{fontSize: "14px"}}>Fecha Final</h1>
-          <input 
-            type='date' 
-            ref={fechaF} 
-            onChange={handleFilterByDate}
-            style={{width: "280px", height: "40px"}}
-          />
-        </div>
-
-      </div>
-      <br/>
-
-
-<div>
-  <h1 style={{ fontSize: "14px" }}>Empleado</h1>
-  <div style={{ width: "600px", zIndex: 999, position: 'relative' }}>
-    <Select
-      options={empleados.map(emp => ({ value: emp.nombre, label: emp.nombre }))}
-      onChange={option => handleChange({ target: { value: option ? option.value : '' } })}
-      placeholder="Seleccione un empleado"
-      isClearable
-      styles={{
-        menu: (provided) => ({ ...provided, zIndex: 1000 }) 
-      }}
-    />
-  </div>
-</div>
+          {/* FECHAS LADO A LADO */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
+            <div>
+              <label>Fecha Inicial</label>
+              <input type="date" ref={fechaI} onChange={handleFilterByDate} style={{ width: '280px', height: '40px', padding: '5px', borderRadius: '5px', border: '1px solid #ccc' }} />
+            </div>
+            <div>
+              <label>Fecha Final</label>
+              <input type="date" ref={fechaF} onChange={handleFilterByDate} style={{ width: '280px', height: '40px', padding: '5px', borderRadius: '5px', border: '1px solid #ccc' }} />
+            </div>
+          </div>
 
           {/* Select Empleado */}
           <CRow className="mb-3">
@@ -224,7 +209,7 @@ function App() {
           {/* Botón Mostrar Marcaciones */}
           <CRow className="mb-3">
             <CCol className="text-center" style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
-              <CButton color="info" className="px-4" onClick={handleFilterByDate} style={{ height: "40px", textAlign: 'center', fontSize: "14px", margin: "10px", width: "177px" }}>
+              <CButton class= "boton" color="info" className="px-4" onClick={handleFilterByDate} style={{ height: "40px", textAlign: 'center', fontSize: "14px", margin: "10px", width: "177px" }}>
                 Mostrar Marcaciones
               </CButton>
             </CCol>
