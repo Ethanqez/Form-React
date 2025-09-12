@@ -14,9 +14,22 @@ import {
   CCol,
 } from '@coreui/react';
 
+// Función para formatear fechas a DD/MM/YYYY
+const formatDateLatino = (date) => {
+  const d = date.getDate().toString().padStart(2, '0');
+  const m = (date.getMonth() + 1).toString().padStart(2, '0');
+  const y = date.getFullYear();
+  return `${d}/${m}/${y}`;
+};
+
 function App() {
   const columns = [
-    { name: <b>Fecha</b>, selector: row => row.fecha, sortable: true, cell: row => <b>{row.fecha}</b> },
+    { 
+      name: <b>Fecha</b>, 
+      selector: row => row.fecha, 
+      sortable: true, 
+      cell: row => <b>{formatDateLatino(row.fecha)}</b> 
+    },
     { name: <b>Día</b>, selector: row => row.dia },
     { name: <b>H01</b>, selector: row => row.h01 },
     { name: <b>H02</b>, selector: row => row.h02 },
@@ -39,79 +52,82 @@ function App() {
   ];
 
 const empleados = [
-    {
-      nombre: "FUENTES MORALES CAMILA ALEJANDRA",
-      registros: [
-        { fecha: "2025-08-12", dia: "Martes", h01: "08:30", h02: "10:45", h03: "11:50", h04: "13:00", h05: "14:15", total: "05:45" },
-        { fecha: "2025-08-14", dia: "Jueves", h01: "08:15", h02: "10:30", h03: "11:40", h04: "13:00", h05: "14:10", total: "05:00" },
-        { fecha: "2025-08-19", dia: "Martes", h01: "09:00", h02: "11:15", h03: "12:20", h04: "14:00", total: "05:00" },
-      ]
-    },
-    {
-      nombre: "VILLALOBOS GIL JOSÉ LUIS",
-      registros: [
-        { fecha: "2025-08-13", dia: "Miércoles", h01: "14:50", h02: "17:10", h03: "18:20", total: "03:30" },
-        { fecha: "2025-08-15", dia: "Viernes", h01: "13:45", h02: "16:00", h03: "17:20", h04: "18:35", total: "04:50" },
-        { fecha: "2025-08-18", dia: "Lunes", h01: "08:30", h02: "10:30", h03: "11:40", h04: "13:00", total: "04:30" },
-      ]
-    },
-    {
-      nombre: "SALAZAR VÉLEZ RICARDO ANDRÉS",
-      registros: [
-        { fecha: "2025-08-14", dia: "Jueves", h01: "09:50", h02: "12:00", h04: "14:30", total: "04:00" },
-        { fecha: "2025-08-16", dia: "Sábado", h01: "11:10", h02: "13:25", h03: "14:40", h04: "15:50", total: "04:40" },
-        { fecha: "2025-08-17", dia: "Domingo", h01: "10:45", h02: "13:00", h03: "14:15", h04: "15:30", total: "04:45" },
-      ]
-    },
-    {
-      nombre: "NAVARRO CARRILLO ANA BELÉN",
-      registros: [
-        { fecha: "2025-08-13", dia: "Miércoles", h01: "09:15", h02: "11:20", h03: "12:35", h04: "14:00", total: "04:45" },
-        { fecha: "2025-08-16", dia: "Sábado", h01: "08:45", h02: "10:50", h03: "12:05", h05: "13:30", total: "04:45" },
-        { fecha: "2025-08-20", dia: "Miércoles", h01: "09:00", h02: "11:10", h03: "12:25", h04: "13:40", total: "04:40" },
-      ]
-    },
-    {
-      nombre: "DELGADO SUÁREZ LUIS MIGUEL",
-      registros: [
-        { fecha: "2025-08-13", dia: "Miércoles", h01: "15:00", h02: "17:15", h03: "18:30", h04: "19:45", total: "04:45" },
-        { fecha: "2025-08-18", dia: "Lunes", h01: "09:30", h02: "11:50", h03: "13:00", h04: "14:30", total: "05:00" },
-      ]
-    },
-    {
-      nombre: "CASTRO MENDOZA LAURA VALERIA",
-      registros: [
-        { fecha: "2025-08-12", dia: "Martes", h01: "07:50", h02: "10:00", h03: "11:15", h04: "12:30", total: "04:40" },
-        { fecha: "2025-08-15", dia: "Viernes", h01: "08:20", h02: "10:40", h03: "12:00", total: "04:00" },
-      ]
-    },
-    {
-      nombre: "RAMÍREZ TORRES PABLO ENRIQUE",
-      registros: [
-        { fecha: "2025-08-13", dia: "Miércoles", h01: "10:00", h02: "12:15", h03: "13:30", h04: "14:45", total: "04:45" },
-        { fecha: "2025-08-16", dia: "Sábado", h01: "09:10", h02: "11:20", h03: "12:40", total: "03:30" },
-      ]
-    },
-    {
-      nombre: "HERRERA GÓMEZ DANIELA ISABEL",
-      registros: [
-        { fecha: "2025-08-14", dia: "Jueves", h01: "08:00", h02: "10:15", h03: "11:30", h04: "12:45", total: "04:45" },
-        { fecha: "2025-08-17", dia: "Domingo", h01: "09:30", h02: "11:40", h03: "12:50", total: "03:20" },
-      ]
-    },
-  ];
+  {
+    nombre: "FUENTES MORALES CAMILA ALEJANDRA",
+    registros: [
+      { fecha: new Date("2025-08-12"), dia: "Martes", h01: "08:30", h02: "10:45", h03: "11:50", h04: "13:00", h05: "14:15", total: "05:45" },
+      { fecha: new Date("2025-08-14"), dia: "Jueves", h01: "08:15", h02: "10:30", h03: "11:40", h04: "13:00", h05: "14:10", total: "05:00" },
+      { fecha: new Date("2025-08-19"), dia: "Martes", h01: "09:00", h02: "11:15", h03: "12:20", h04: "14:00", total: "05:00" },
+    ]
+  },
+  {
+    nombre: "VILLALOBOS GIL JOSÉ LUIS",
+    registros: [
+      { fecha: new Date("2025-08-13"), dia: "Miércoles", h01: "14:50", h02: "17:10", h03: "18:20", total: "03:30" },
+      { fecha: new Date("2025-08-15"), dia: "Viernes", h01: "13:45", h02: "16:00", h03: "17:20", h04: "18:35", total: "04:50" },
+      { fecha: new Date("2025-08-18"), dia: "Lunes", h01: "08:30", h02: "10:30", h03: "11:40", h04: "13:00", total: "04:30" },
+    ]
+  },
+  {
+    nombre: "SALAZAR VÉLEZ RICARDO ANDRÉS",
+    registros: [
+      { fecha: new Date("2025-08-14"), dia: "Jueves", h01: "09:50", h02: "12:00", h04: "14:30", total: "04:00" },
+      { fecha: new Date("2025-08-16"), dia: "Sábado", h01: "11:10", h02: "13:25", h03: "14:40", h04: "15:50", total: "04:40" },
+      { fecha: new Date("2025-08-17"), dia: "Domingo", h01: "10:45", h02: "13:00", h03: "14:15", h04: "15:30", total: "04:45" },
+    ]
+  },
+  {
+    nombre: "NAVARRO CARRILLO ANA BELÉN",
+    registros: [
+      { fecha: new Date("2025-08-13"), dia: "Miércoles", h01: "09:15", h02: "11:20", h03: "12:35", h04: "14:00", total: "04:45" },
+      { fecha: new Date("2025-08-16"), dia: "Sábado", h01: "08:45", h02: "10:50", h03: "12:05", h05: "13:30", total: "04:45" },
+      { fecha: new Date("2025-08-20"), dia: "Miércoles", h01: "09:00", h02: "11:10", h03: "12:25", h04: "13:40", total: "04:40" },
+    ]
+  },
+  {
+    nombre: "DELGADO SUÁREZ LUIS MIGUEL",
+    registros: [
+      { fecha: new Date("2025-08-13"), dia: "Miércoles", h01: "15:00", h02: "17:15", h03: "18:30", h04: "19:45", total: "04:45" },
+      { fecha: new Date("2025-08-18"), dia: "Lunes", h01: "09:30", h02: "11:50", h03: "13:00", h04: "14:30", total: "05:00" },
+    ]
+  },
+  {
+    nombre: "CASTRO MENDOZA LAURA VALERIA",
+    registros: [
+      { fecha: new Date("2025-08-12"), dia: "Martes", h01: "07:50", h02: "10:00", h03: "11:15", h04: "12:30", total: "04:40" },
+      { fecha: new Date("2025-08-15"), dia: "Viernes", h01: "08:20", h02: "10:40", h03: "12:00", total: "04:00" },
+    ]
+  },
+  {
+    nombre: "RAMÍREZ TORRES PABLO ENRIQUE",
+    registros: [
+      { fecha: new Date("2025-08-13"), dia: "Miércoles", h01: "10:00", h02: "12:15", h03: "13:30", h04: "14:45", total: "04:45" },
+      { fecha: new Date("2025-08-16"), dia: "Sábado", h01: "09:10", h02: "11:20", h03: "12:40", total: "03:30" },
+    ]
+  },
+  {
+    nombre: "HERRERA GÓMEZ DANIELA ISABEL",
+    registros: [
+      { fecha: new Date("2025-08-14"), dia: "Jueves", h01: "08:00", h02: "10:15", h03: "11:30", h04: "12:45", total: "04:45" },
+      { fecha: new Date("2025-08-17"), dia: "Domingo", h01: "09:30", h02: "11:40", h03: "12:50", total: "03:20" },
+    ]
+  },
+];
+
 
   const allRegistros = empleados.flatMap(emp => emp.registros.map(r => ({ ...r, empleado: emp.nombre })));
   const [registro, setRegistro] = useState(allRegistros);
+  const [empleadoSeleccionado, setEmpleadoSeleccionado] = useState("");
   const fechaI = useRef();
   const fechaF = useRef();
 
   const handleChange = (e) => {
     const nombre = e.target.value;
+    setEmpleadoSeleccionado(nombre);
     if (!nombre) { setRegistro(allRegistros); return; }
-    const empleadoSeleccionado = empleados.find(emp => emp.nombre === nombre);
-    if (empleadoSeleccionado) {
-      setRegistro(empleadoSeleccionado.registros.map(r => ({ ...r, empleado: empleadoSeleccionado.nombre })));
+    const emp = empleados.find(emp => emp.nombre === nombre);
+    if (emp) {
+      setRegistro(emp.registros.map(r => ({ ...r, empleado: emp.nombre })));
     }
   };
 
@@ -121,11 +137,15 @@ const empleados = [
     if (!startValue || !endValue) { setRegistro(allRegistros); return; }
     const start = new Date(startValue);
     const end = new Date(endValue);
-    const filtrados = allRegistros.filter(registro => {
-      const fechaRegistro = new Date(registro.fecha);
-      return fechaRegistro >= start && fechaRegistro <= end;
-    });
+    const filtrados = allRegistros.filter(registro => registro.fecha >= start && registro.fecha <= end);
     setRegistro(filtrados);
+  };
+
+  const handleMostrar = () => {
+    setRegistro(allRegistros);
+    setEmpleadoSeleccionado("");
+    fechaI.current.value = "";
+    fechaF.current.value = "";
   };
 
   const handleGeneratePDF = () => {
@@ -148,16 +168,15 @@ const empleados = [
           <h2 className="m-0 text-center">DETALLE DE MARCACIONES</h2>
         </CCardHeader>
         <CCardBody style={{ backgroundColor: '#f0f8ff' }}>
-
           {/* FECHAS LADO A LADO */}
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
             <div>
               <label>Fecha Inicial</label>
-              <input type="date" ref={fechaI} onChange={handleFilterByDate} style={{ width: '280px', height: '40px', padding: '5px', borderRadius: '5px', border: '1px solid #ccc' }} />
+              <input type="date" ref={fechaI} style={{ width: '280px', height: '40px', padding: '5px', borderRadius: '5px', border: '1px solid #ccc' }} />
             </div>
             <div>
               <label>Fecha Final</label>
-              <input type="date" ref={fechaF} onChange={handleFilterByDate} style={{ width: '280px', height: '40px', padding: '5px', borderRadius: '5px', border: '1px solid #ccc' }} />
+              <input type="date" ref={fechaF} style={{ width: '280px', height: '40px', padding: '5px', borderRadius: '5px', border: '1px solid #ccc' }} />
             </div>
           </div>
 
@@ -165,9 +184,15 @@ const empleados = [
           <CRow className="mb-3">
             <CCol>
               <label>Empleado</label>
-              <CFormSelect onChange={handleChange}>
-                <option value=""></option>
-                {empleados.map((emp, index) => <option key={index} value={emp.nombre}>{emp.nombre}</option>)}
+              <CFormSelect value={empleadoSeleccionado} onChange={handleChange}>
+                <option value="" hidden>
+                  Seleccione un empleado
+                </option>
+                {empleados.map((emp, index) => (
+                  <option key={index} value={emp.nombre}>
+                    {emp.nombre}
+                  </option>
+                ))}
               </CFormSelect>
             </CCol>
           </CRow>
@@ -175,7 +200,13 @@ const empleados = [
           {/* Botón Mostrar Marcaciones */}
           <CRow className="mb-3">
             <CCol className="text-center" style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
-              <CButton color="info" className="px-4" onClick={handleFilterByDate} style={{ height: "40px", textAlign: 'center', fontSize: "14px", margin: "10px", width: "177px" }}>
+              <CButton 
+                class="boton"
+                color="info" 
+                className="px-4" 
+                onClick={handleMostrar} 
+                style={{ height: "40px", textAlign: 'center', fontSize: "14px", margin: "10px", width: "177px" }}
+              >
                 Mostrar Marcaciones
               </CButton>
             </CCol>
