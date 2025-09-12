@@ -284,33 +284,6 @@ const PDFDocument = ({ registros, empleadoSeleccionado, fechaInicio, fechaFin })
             </View>
           ))}
         </View>
-
-        {/* Resumen */}
-        <View style={styles.summary}>
-          <Text style={styles.summaryTitle}>RESUMEN DEL PERÍODO</Text>
-          <Text style={styles.summaryText}>
-            Total de registros: {registros.length}
-          </Text>
-          <Text style={styles.summaryText}>
-            Días laborados: {getDiasLaborados()}
-          </Text>
-          <Text style={styles.summaryText}>
-            Total de horas trabajadas: {getTotalHoras().toFixed(2)} horas
-          </Text>
-          <Text style={styles.summaryText}>
-            Promedio diario: {registros.length > 0 ? (getTotalHoras() / registros.length).toFixed(2) : 0} horas
-          </Text>
-          {Object.keys(registrosAgrupados).length > 1 && (
-            <>
-              <Text style={styles.summaryTitle}>DESGLOSE POR EMPLEADO:</Text>
-              {Object.entries(registrosAgrupados).map(([empleado, regs]) => (
-                <Text key={empleado} style={styles.summaryText}>
-                  • {empleado.length > 30 ? empleado.substring(0, 30) + '...' : empleado}: {regs.length} registros
-                </Text>
-              ))}
-            </>
-          )}
-        </View>
       </Page>
     </Document>
   );
