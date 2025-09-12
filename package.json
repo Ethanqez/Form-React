@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@coreui/icons-react": "^2.3.0",
+    "@coreui/react": "^5.8.0",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.8.0",
     "@testing-library/react": "^16.3.0",
@@ -14,6 +16,7 @@
     "react-data-table-component": "^7.7.0",
     "react-dom": "^19.1.1",
     "react-scripts": "5.0.1",
+    "react-select": "^5.10.2",
     "react-table-component": "^0.9.8",
     "web-vitals": "^2.1.4"
   },
