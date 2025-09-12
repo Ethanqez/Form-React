@@ -49,6 +49,20 @@ const styles = StyleSheet.create({
     fontSize: 9,
     color: '#666',
   },
+  // Sección específica para mostrar empleados cuando hay múltiples
+  employeeSection: {
+    marginBottom: 15,
+    backgroundColor: '#e3f2fd',
+    padding: 10,
+    borderRadius: 4,
+  },
+  employeeSectionTitle: {
+    fontSize: 11,
+    fontWeight: 'bold',
+    color: '#2193b0',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
   table: {
     display: 'table',
     width: 'auto',
@@ -63,16 +77,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   tableColHeader: {
-    width: '8%',
-    borderStyle: 'solid',
-    borderWidth: 1,
-    borderColor: '#bfbfbf',
-    borderLeftWidth: 0,
-    borderTopWidth: 0,
-    backgroundColor: '#e3f2fd',
-  },
-  tableColHeaderWide: {
-    width: '12%',
+    width: '9%',
     borderStyle: 'solid',
     borderWidth: 1,
     borderColor: '#bfbfbf',
@@ -81,15 +86,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#e3f2fd',
   },
   tableCol: {
-    width: '8%',
-    borderStyle: 'solid',
-    borderWidth: 1,
-    borderColor: '#bfbfbf',
-    borderLeftWidth: 0,
-    borderTopWidth: 0,
-  },
-  tableColWide: {
-    width: '12%',
+    width: '9%',
     borderStyle: 'solid',
     borderWidth: 1,
     borderColor: '#bfbfbf',
@@ -107,68 +104,45 @@ const styles = StyleSheet.create({
     fontSize: 7,
     textAlign: 'center',
   },
-  tableCellLeft: {
-    margin: 2,
-    fontSize: 7,
-    textAlign: 'left',
-  },
-  summary: {
-    marginTop: 15,
-    padding: 10,
-    backgroundColor: '#f0f8ff',
-    borderRadius: 4,
-  },
-  summaryTitle: {
-    fontSize: 10,
-    fontWeight: 'bold',
-    marginBottom: 5,
-    color: '#2193b0',
-  },
-  summaryText: {
-    fontSize: 8,
-    marginBottom: 2,
-  },
 });
 
 // Componente del documento PDF
 const PDFDocument = ({ registros, empleadoSeleccionado, fechaInicio, fechaFin }) => {
   const getCurrentDate = () => {
     const now = new Date();
-    return now.toLocaleDateString('es-ES', { 
-      weekday: 'long', 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    });
-  };
-
-  const getTotalHoras = () => {
-    return registros.reduce((total, reg) => {
-      const horas = parseFloat(reg.total.replace(':', '.')) || 0;
-      return total + horas;
-    }, 0);
-  };
-
-  const getDiasLaborados = () => {
-    return registros.length;
+    return now.toLocaleDateString('es-ES');
   };
 
   const getEmpleadoInfo = () => {
+    // Si hay un empleado seleccionado, mostrar su nombre
     if (empleadoSeleccionado) {
-      const emp = empleados.find(e => e.nombre === empleadoSeleccionado);
-      return emp ? emp.nombre : empleadoSeleccionado;
+      return empleadoSeleccionado;
     }
+    
+    // Si no hay empleado seleccionado, verificar si todos los registros son del mismo empleado
+    const empleadosUnicos = [...new Set(registros.map(reg => reg.empleado))];
+    
+    if (empleadosUnicos.length === 1) {
+      return empleadosUnicos[0];
+    }
+    
     return "TODOS LOS EMPLEADOS";
   };
 
-  // Agrupar registros por empleado
-  const registrosAgrupados = registros.reduce((acc, reg) => {
-    if (!acc[reg.empleado]) {
-      acc[reg.empleado] = [];
-    }
-    acc[reg.empleado].push(reg);
-    return acc;
-  }, {});
+  // Verificar si necesitamos mostrar múltiples empleados
+  const empleadosUnicos = [...new Set(registros.map(reg => reg.empleado))];
+  const esMultipleEmpleados = empleadosUnicos.length > 1 && !empleadoSeleccionado;
+
+  // Agrupar registros por empleado si es necesario
+  const registrosAgrupados = esMultipleEmpleados 
+    ? registros.reduce((acc, reg) => {
+        if (!acc[reg.empleado]) {
+          acc[reg.empleado] = [];
+        }
+        acc[reg.empleado].push(reg);
+        return acc;
+      }, {})
+    : { [getEmpleadoInfo()]: registros };
 
   return (
     <Document>
@@ -182,7 +156,14 @@ const PDFDocument = ({ registros, empleadoSeleccionado, fechaInicio, fechaFin })
                 Empleado: {getEmpleadoInfo()}
               </Text>
               <Text style={styles.date}>
-                Período: {fechaInicio || 'Desde el inicio'} - {fechaFin || 'Hasta la fecha'}
+                {fechaInicio && fechaFin 
+                  ? `${new Date(fechaInicio).toLocaleDateString('es-ES')} - ${new Date(fechaFin).toLocaleDateString('es-ES')}`
+                  : fechaInicio 
+                  ? `Desde: ${new Date(fechaInicio).toLocaleDateString('es-ES')}`
+                  : fechaFin
+                  ? `Hasta: ${new Date(fechaFin).toLocaleDateString('es-ES')}`
+                  : console.log("Desde: "+ fechaInicio,fechaFin)
+                }
               </Text>
             </View>
             <View>
@@ -193,97 +174,105 @@ const PDFDocument = ({ registros, empleadoSeleccionado, fechaInicio, fechaFin })
           </View>
         </View>
 
-        {/* Tabla */}
-        <View style={styles.table}>
-          {/* Header de la tabla */}
-          <View style={styles.tableRow}>
-            <View style={styles.tableColHeaderWide}>
-              <Text style={styles.tableCellHeader}>Empleado</Text>
-            </View>
-            <View style={styles.tableColHeader}>
-              <Text style={styles.tableCellHeader}>Fecha</Text>
-            </View>
-            <View style={styles.tableColHeader}>
-              <Text style={styles.tableCellHeader}>Día</Text>
-            </View>
-            <View style={styles.tableColHeader}>
-              <Text style={styles.tableCellHeader}>H1</Text>
-            </View>
-            <View style={styles.tableColHeader}>
-              <Text style={styles.tableCellHeader}>H2</Text>
-            </View>
-            <View style={styles.tableColHeader}>
-              <Text style={styles.tableCellHeader}>H3</Text>
-            </View>
-            <View style={styles.tableColHeader}>
-              <Text style={styles.tableCellHeader}>H4</Text>
-            </View>
-            <View style={styles.tableColHeader}>
-              <Text style={styles.tableCellHeader}>H5</Text>
-            </View>
-            <View style={styles.tableColHeader}>
-              <Text style={styles.tableCellHeader}>H6</Text>
-            </View>
-            <View style={styles.tableColHeader}>
-              <Text style={styles.tableCellHeader}>H7</Text>
-            </View>
-            <View style={styles.tableColHeader}>
-              <Text style={styles.tableCellHeader}>H8</Text>
-            </View>
-            <View style={styles.tableColHeader}>
-              <Text style={styles.tableCellHeader}>Total</Text>
-            </View>
-          </View>
+        {/* Contenido principal */}
+        {Object.entries(registrosAgrupados).map(([nombreEmpleado, registrosEmpleado], empleadoIndex) => (
+          <View key={empleadoIndex}>
+            {/* Mostrar nombre del empleado solo si hay múltiples */}
+            {esMultipleEmpleados && (
+              <View style={styles.employeeSection}>
+                <Text style={styles.employeeSectionTitle}>
+                  {nombreEmpleado}
+                </Text>
+              </View>
+            )}
 
-          {/* Filas de datos */}
-          {registros.map((registro, index) => (
-            <View key={index} style={styles.tableRow}>
-              <View style={styles.tableColWide}>
-                <Text style={styles.tableCellLeft}>
-                  {registro.empleado.length > 25 
-                    ? registro.empleado.substring(0, 25) + '...' 
-                    : registro.empleado
-                  }
-                </Text>
+            {/* Tabla */}
+            <View style={styles.table}>
+              {/* Header de la tabla */}
+              <View style={styles.tableRow}>
+                <View style={styles.tableColHeader}>
+                  <Text style={styles.tableCellHeader}>Fecha</Text>
+                </View>
+                <View style={styles.tableColHeader}>
+                  <Text style={styles.tableCellHeader}>Día</Text>
+                </View>
+                <View style={styles.tableColHeader}>
+                  <Text style={styles.tableCellHeader}>H1</Text>
+                </View>
+                <View style={styles.tableColHeader}>
+                  <Text style={styles.tableCellHeader}>H2</Text>
+                </View>
+                <View style={styles.tableColHeader}>
+                  <Text style={styles.tableCellHeader}>H3</Text>
+                </View>
+                <View style={styles.tableColHeader}>
+                  <Text style={styles.tableCellHeader}>H4</Text>
+                </View>
+                <View style={styles.tableColHeader}>
+                  <Text style={styles.tableCellHeader}>H5</Text>
+                </View>
+                <View style={styles.tableColHeader}>
+                  <Text style={styles.tableCellHeader}>H6</Text>
+                </View>
+                <View style={styles.tableColHeader}>
+                  <Text style={styles.tableCellHeader}>H7</Text>
+                </View>
+                <View style={styles.tableColHeader}>
+                  <Text style={styles.tableCellHeader}>H8</Text>
+                </View>
+                <View style={styles.tableColHeader}>
+                  <Text style={styles.tableCellHeader}>Total</Text>
+                </View>
               </View>
-              <View style={styles.tableCol}>
-                <Text style={styles.tableCell}>
-                  {registro.fecha.toLocaleDateString('es-ES')}
-                </Text>
-              </View>
-              <View style={styles.tableCol}>
-                <Text style={styles.tableCell}>{registro.dia}</Text>
-              </View>
-              <View style={styles.tableCol}>
-                <Text style={styles.tableCell}>{registro.h01 || ''}</Text>
-              </View>
-              <View style={styles.tableCol}>
-                <Text style={styles.tableCell}>{registro.h02 || ''}</Text>
-              </View>
-              <View style={styles.tableCol}>
-                <Text style={styles.tableCell}>{registro.h03 || ''}</Text>
-              </View>
-              <View style={styles.tableCol}>
-                <Text style={styles.tableCell}>{registro.h04 || ''}</Text>
-              </View>
-              <View style={styles.tableCol}>
-                <Text style={styles.tableCell}>{registro.h05 || ''}</Text>
-              </View>
-              <View style={styles.tableCol}>
-                <Text style={styles.tableCell}>{registro.h06 || ''}</Text>
-              </View>
-              <View style={styles.tableCol}>
-                <Text style={styles.tableCell}>{registro.h07 || ''}</Text>
-              </View>
-              <View style={styles.tableCol}>
-                <Text style={styles.tableCell}>{registro.h08 || ''}</Text>
-              </View>
-              <View style={styles.tableCol}>
-                <Text style={styles.tableCell}>{registro.total}</Text>
-              </View>
+
+              {/* Filas de datos */}
+              {registrosEmpleado.map((registro, index) => (
+                <View key={index} style={styles.tableRow}>
+                  <View style={styles.tableCol}>
+                    <Text style={styles.tableCell}>
+                      {registro.fecha.toLocaleDateString('es-ES')}
+                    </Text>
+                  </View>
+                  <View style={styles.tableCol}>
+                    <Text style={styles.tableCell}>{registro.dia}</Text>
+                  </View>
+                  <View style={styles.tableCol}>
+                    <Text style={styles.tableCell}>{registro.h01 || ''}</Text>
+                  </View>
+                  <View style={styles.tableCol}>
+                    <Text style={styles.tableCell}>{registro.h02 || ''}</Text>
+                  </View>
+                  <View style={styles.tableCol}>
+                    <Text style={styles.tableCell}>{registro.h03 || ''}</Text>
+                  </View>
+                  <View style={styles.tableCol}>
+                    <Text style={styles.tableCell}>{registro.h04 || ''}</Text>
+                  </View>
+                  <View style={styles.tableCol}>
+                    <Text style={styles.tableCell}>{registro.h05 || ''}</Text>
+                  </View>
+                  <View style={styles.tableCol}>
+                    <Text style={styles.tableCell}>{registro.h06 || ''}</Text>
+                  </View>
+                  <View style={styles.tableCol}>
+                    <Text style={styles.tableCell}>{registro.h07 || ''}</Text>
+                  </View>
+                  <View style={styles.tableCol}>
+                    <Text style={styles.tableCell}>{registro.h08 || ''}</Text>
+                  </View>
+                  <View style={styles.tableCol}>
+                    <Text style={styles.tableCell}>{registro.total}</Text>
+                  </View>
+                </View>
+              ))}
             </View>
-          ))}
-        </View>
+
+            {/* Espacio entre empleados */}
+            {esMultipleEmpleados && empleadoIndex < Object.keys(registrosAgrupados).length - 1 && (
+              <View style={{ marginBottom: 20 }} />
+            )}
+          </View>
+        ))}
       </Page>
     </Document>
   );
@@ -301,7 +290,16 @@ const PDFInterface = ({ registros, onBack }) => {
     setEmpleadoSeleccionado(nombre);
     
     let filtrados = registros;
-    
+    if (!nombre) { 
+      setEmpleadoSeleccionado(empleadoSeleccionado); 
+      return; 
+    }
+
+    const emp = empleados.find(emp => emp.nombre === nombre);
+    if (emp) {
+      setEmpleadoSeleccionado(emp.registros.map(r => ({ ...r, empleado: emp.nombre })));
+    }
+
     if (nombre) {
       filtrados = filtrados.filter(reg => reg.empleado === nombre);
     }
@@ -336,18 +334,6 @@ const PDFInterface = ({ registros, onBack }) => {
     if (fechaInicio || fechaFin) {
       const inicio = fechaInicio ? new Date(fechaInicio) : null;
       const fin = fechaFin ? new Date(fechaFin) : null;
-      
-      filtrados = filtrados.filter(registro => {
-        const fechaReg = new Date(registro.fecha);
-        if (inicio && fin) {
-          return fechaReg >= inicio && fechaReg <= fin;
-        } else if (inicio) {
-          return fechaReg >= inicio;
-        } else if (fin) {
-          return fechaReg <= fin;
-        }
-        return true;
-      });
     }
     
     setRegistrosFiltrados(filtrados);
@@ -362,6 +348,20 @@ const PDFInterface = ({ registros, onBack }) => {
 
   // Obtener lista única de empleados de los registros
   const empleadosUnicos = [...new Set(registros.map(reg => reg.empleado))];
+
+  // Función para obtener el nombre del empleado para el filename
+  const getEmpleadoParaFilename = () => {
+    if (empleadoSeleccionado) {
+      return empleadoSeleccionado.replace(/\s+/g, '_').substring(0, 20);
+    }
+    
+    const empleadosUnicos = [...new Set(registrosFiltrados.map(reg => reg.empleado))];
+    if (empleadosUnicos.length === 1) {
+      return empleadosUnicos[0].replace(/\s+/g, '_').substring(0, 20);
+    }
+    
+    return 'todos';
+  };
 
   return (
     <CContainer className="py-3">
@@ -382,22 +382,22 @@ const PDFInterface = ({ registros, onBack }) => {
           
           {/* Controles de filtros */}
           <CRow className="mb-3">
-            <CCol md={4}>
+            <CCol md={5}>
               <label><strong>Filtrar por Empleado</strong></label>
               <CFormSelect 
                 value={empleadoSeleccionado} 
                 onChange={handleEmpleadoChange}
-                size="sm"
+
               >
                 <option value="">Todos los empleados</option>
-                {empleadosUnicos.map((empleado, index) => (
-                  <option key={index} value={empleado}>
-                    {empleado.length > 40 ? empleado.substring(0, 40) + '...' : empleado}
+                {empleados.map((emp, index) => (
+                  <option key={index} value={emp.nombre}>
+                    {emp.nombre}
                   </option>
                 ))}
               </CFormSelect>
             </CCol>
-            <CCol md={3}>
+            <CCol md={4}>
               <label><strong>Fecha Inicio</strong></label>
               <input 
                 type="date" 
@@ -445,7 +445,7 @@ const PDFInterface = ({ registros, onBack }) => {
                     fechaFin={fechaFin}
                   />
                 }
-                fileName={`marcaciones_${empleadoSeleccionado || 'todos'}_${new Date().toLocaleDateString('es-ES').replace(/\//g, '-')}.pdf`}
+                fileName={`marcaciones_${getEmpleadoParaFilename()}_${new Date().toLocaleDateString('es-ES').replace(/\//g, '-')}.pdf`}
               >
                 {({ blob, url, loading, error }) =>
                   <CButton 
