@@ -48,7 +48,6 @@ function App() {
 
     const start = new Date(startValue);
     const end = new Date(endValue);
-
     const filtrados = allRegistros.filter(registro => {
       const fechaRegistro = new Date(registro.fecha);
       return fechaRegistro >= start && fechaRegistro <= end;
