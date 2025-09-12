@@ -29,8 +29,8 @@ function App() {
     { name: <b>H07</b>, selector: row => row.h07 },
     { name: <b>H08</b>, selector: row => row.h08 },
     { name: <b>TOTAL (Horas)</b>, selector: row => row.total },
-    { 
-      name: <b>Empleado</b>, 
+    {
+      name: <b>Empleado</b>,
       selector: row => row.empleado,
       cell: row => (
         <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
@@ -210,33 +210,59 @@ function App() {
   </div>
 </div>
 
+          {/* Select Empleado */}
+          <CRow className="mb-3">
+            <CCol>
+              <label>Empleado</label>
+              <CFormSelect onChange={handleChange}>
+                <option value=""></option>
+                {empleados.map((emp, index) => <option key={index} value={emp.nombre}>{emp.nombre}</option>)}
+              </CFormSelect>
+            </CCol>
+          </CRow>
 
+          {/* Botón Mostrar Marcaciones */}
+          <CRow className="mb-3">
+            <CCol className="text-center" style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
+              <CButton color="info" className="px-4" onClick={handleFilterByDate} style={{ height: "40px", textAlign: 'center', fontSize: "14px", margin: "10px", width: "177px" }}>
+                Mostrar Marcaciones
+              </CButton>
+            </CCol>
+          </CRow>
 
-      <br/>
-      <div >
-        <input 
-          className="boton" 
-          type='button' 
-          value="Mostrar Marcaciones" 
-          style={{ height: "40px", textAlign: 'center', fontSize: "14px", margin: "17px", width: "177px" }} 
-          onClick={handleFilterByDate}
-        />
-      </div>
+          {/* Tabla */}
+          <div id="data-table" style={{ marginTop: '20px' }}>
+            <DataTable
+              columns={columns}
+              data={registro}
+              fixedHeader
+              fixedHeaderScrollHeight="500px"
+              highlightOnHover
+              striped
+              customStyles={{
+                headCells: { style: { backgroundColor: '#2193b0', color: 'white', fontWeight: 'bold', fontSize: '14px', borderRadius: '5px 5px 0 0' } },
+                cells: { style: { fontSize: '13px', padding: '8px' } },
+              }}
+            />
+          </div>
 
-      <div id="data-table" style={{ display: "flex", justifyContent: "center", alignItems: "center", marginTop: "20px" }}>
-        <DataTable columns={columns} data={registro} fixedHeader fixedHeaderScrollHeight="500px" />
-      </div>
-
-      <div style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}>
-        <button
-          id="generate-pdf-btn"
-          onClick={handleGeneratePDF}
-          style={{ padding: "10px 20px", fontSize: "14px" }}
-        >
-          Generar PDF
-        </button>
-      </div>
-    </div>
+          {/* Botón PDF */}
+          <CRow className="mt-4">
+            <CCol className="text-center">
+              <CButton
+                color="success"
+                className="px-5 py-2"
+                id="generate-pdf-btn"
+                onClick={handleGeneratePDF}
+                style={{ background: 'linear-gradient(90deg, #56ab2f, #a8e063)', border: 'none', borderRadius: '8px' }}
+              >
+                Generar PDF
+              </CButton>
+            </CCol>
+          </CRow>
+        </CCardBody>
+      </CCard>
+    </CContainer>
   );
 }
 
