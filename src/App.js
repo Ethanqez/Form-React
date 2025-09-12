@@ -1,24 +1,22 @@
 import './App.css';
 import { useState, useRef } from 'react';
 import DataTable from 'react-data-table-component';
-import jsPDF from 'jspdf'; 
-import html2canvas from 'html2canvas'; 
-import Select from 'react-select';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+import {
+  CButton,
+  CCard,
+  CCardBody,
+  CCardHeader,
+  CFormSelect,
+  CContainer,
+  CRow,
+  CCol,
+} from '@coreui/react';
 
 function App() {
   const columns = [
-    { 
-      name: <b>Fecha</b>, 
-      selector: row => row.fecha, 
-      sortable: true,
-      cell: row => {
-        const fecha = new Date(row.fecha);
-        const dia = fecha.getDate().toString().padStart(2, '0');
-        const mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
-        const año = fecha.getFullYear();
-        return <b>{`${dia}/${mes}/${año}`}</b>;
-      }   
-    },
+    { name: <b>Fecha</b>, selector: row => row.fecha, sortable: true, cell: row => <b>{row.fecha}</b> },
     { name: <b>Día</b>, selector: row => row.dia },
     { name: <b>H01</b>, selector: row => row.h01 },
     { name: <b>H02</b>, selector: row => row.h02 },
@@ -31,19 +29,16 @@ function App() {
     { name: <b>TOTAL (Horas)</b>, selector: row => row.total },
     { 
       name: <b>Empleado</b>, 
-      selector: row => row.empleado,
+      selector: row => row.empleado, 
       cell: row => (
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
-          {row.empleado.split(" ").map((palabra, i) => (
-            <div key={i}>{palabra}</div>
-          ))}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+          {row.empleado.split(' ').map((palabra, i) => <div key={i}>{palabra}</div>)}
         </div>
       )
     },
   ];
 
-  // nuevo array unificado
-  const empleados = [
+const empleados = [
     {
       nombre: "FUENTES MORALES CAMILA ALEJANDRA",
       registros: [
@@ -106,137 +101,119 @@ function App() {
     },
   ];
 
-  const allRegistros = empleados.flatMap(emp =>
-    emp.registros.map(r => ({ ...r, empleado: emp.nombre }))
-  );
-
+  const allRegistros = empleados.flatMap(emp => emp.registros.map(r => ({ ...r, empleado: emp.nombre })));
   const [registro, setRegistro] = useState(allRegistros);
   const fechaI = useRef();
   const fechaF = useRef();
 
   const handleChange = (e) => {
     const nombre = e.target.value;
-    if (!nombre) {
-      setRegistro(allRegistros);
-      return;
-    }
+    if (!nombre) { setRegistro(allRegistros); return; }
     const empleadoSeleccionado = empleados.find(emp => emp.nombre === nombre);
     if (empleadoSeleccionado) {
-      setRegistro(
-        empleadoSeleccionado.registros.map(r => ({
-          ...r,
-          empleado: empleadoSeleccionado.nombre
-        }))
-      );
+      setRegistro(empleadoSeleccionado.registros.map(r => ({ ...r, empleado: empleadoSeleccionado.nombre })));
     }
   };
 
   const handleFilterByDate = () => {
     const startValue = fechaI.current.value;
     const endValue = fechaF.current.value;
-
-    if (!startValue || !endValue) {
-      setRegistro(allRegistros);
-      return;
-    }
-
+    if (!startValue || !endValue) { setRegistro(allRegistros); return; }
     const start = new Date(startValue);
     const end = new Date(endValue);
-
     const filtrados = allRegistros.filter(registro => {
       const fechaRegistro = new Date(registro.fecha);
       return fechaRegistro >= start && fechaRegistro <= end;
     });
-
     setRegistro(filtrados);
   };
 
   const handleGeneratePDF = () => {
     const input = document.getElementById('content');
-    const button = document.getElementById('generate-pdf-btn'); 
-    button.style.display = 'none'; 
-
-    html2canvas(input, { scale: 2 }).then(canvas => { 
+    const button = document.getElementById('generate-pdf-btn');
+    button.style.display = 'none';
+    html2canvas(input, { scale: 2 }).then(canvas => {
       const imgData = canvas.toDataURL('image/png');
-      const doc = new jsPDF('landscape'); 
-      doc.addImage(imgData, 'PNG', 10, 10, 280, 150); 
-      doc.save('marcaciones.pdf'); 
-
+      const doc = new jsPDF('landscape');
+      doc.addImage(imgData, 'PNG', 10, 10, 280, 150);
+      doc.save('marcaciones.pdf');
       button.style.display = 'block';
     });
   };
 
   return (
-    <div id="content">
-      <h2>DETALLE DE MARCACIONES</h2>
-      <div className="contenedor">
+    <CContainer id="content" className="py-5">
+      <CCard className="shadow-lg border-0">
+        <CCardHeader className="text-white" style={{ background: 'linear-gradient(90deg, #2193b0, #6dd5ed)' }}>
+          <h2 className="m-0 text-center">DETALLE DE MARCACIONES</h2>
+        </CCardHeader>
+        <CCardBody style={{ backgroundColor: '#f0f8ff' }}>
 
-        <div className="grupo">
-          <h1 style={{fontSize: "14px"}}>Fecha Inicial</h1>
-          <input 
-            type='date' 
-            ref={fechaI} 
-            onChange={handleFilterByDate}
-            style={{width: "280px", height: "40px"}}
-          />
-        </div>
+          {/* FECHAS LADO A LADO */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
+            <div>
+              <label>Fecha Inicial</label>
+              <input type="date" ref={fechaI} onChange={handleFilterByDate} style={{ width: '280px', height: '40px', padding: '5px', borderRadius: '5px', border: '1px solid #ccc' }} />
+            </div>
+            <div>
+              <label>Fecha Final</label>
+              <input type="date" ref={fechaF} onChange={handleFilterByDate} style={{ width: '280px', height: '40px', padding: '5px', borderRadius: '5px', border: '1px solid #ccc' }} />
+            </div>
+          </div>
 
-        <div className="grupo">
-          <h1 style={{fontSize: "14px"}}>Fecha Final</h1>
-          <input 
-            type='date' 
-            ref={fechaF} 
-            onChange={handleFilterByDate}
-            style={{width: "280px", height: "40px"}}
-          />
-        </div>
+          {/* Select Empleado */}
+          <CRow className="mb-3">
+            <CCol>
+              <label>Empleado</label>
+              <CFormSelect onChange={handleChange} className="shadow-sm">
+                <option value=""></option>
+                {empleados.map((emp, index) => <option key={index} value={emp.nombre}>{emp.nombre}</option>)}
+              </CFormSelect>
+            </CCol>
+          </CRow>
 
-      </div>
-      <br/>
+          {/* Botón Mostrar */}
+          <CRow className="mb-3">
+            <CCol className="text-center">
+              <CButton color="info" className="px-4 shadow-sm" onClick={handleFilterByDate}>
+                Mostrar Marcaciones
+              </CButton>
+            </CCol>
+          </CRow>
 
+          {/* Tabla */}
+          <div id="data-table" style={{ marginTop: '20px' }}>
+            <DataTable
+              columns={columns}
+              data={registro}
+              fixedHeader
+              fixedHeaderScrollHeight="500px"
+              highlightOnHover
+              striped
+              customStyles={{
+                headCells: { style: { backgroundColor: '#2193b0', color: 'white', fontWeight: 'bold', fontSize: '14px', borderRadius: '5px 5px 0 0' } },
+                cells: { style: { fontSize: '13px', padding: '8px' } },
+              }}
+            />
+          </div>
 
-<div>
-  <h1 style={{ fontSize: "14px" }}>Empleado</h1>
-  <div style={{ width: "600px", zIndex: 999, position: 'relative' }}>
-    <Select
-      options={empleados.map(emp => ({ value: emp.nombre, label: emp.nombre }))}
-      onChange={option => handleChange({ target: { value: option ? option.value : '' } })}
-      placeholder="Seleccione un empleado"
-      isClearable
-      styles={{
-        menu: (provided) => ({ ...provided, zIndex: 1000 }) 
-      }}
-    />
-  </div>
-</div>
-
-
-
-      <br/>
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-        <input 
-          className="boton" 
-          type='button' 
-          value="Mostrar Marcaciones" 
-          style={{ height: "40px", textAlign: 'center', fontSize: "14px", margin: "17px", width: "177px" }} 
-          onClick={handleFilterByDate}
-        />
-      </div>
-
-      <div id="data-table" style={{ display: "flex", justifyContent: "center", alignItems: "center", marginTop: "20px" }}>
-        <DataTable columns={columns} data={registro} fixedHeader fixedHeaderScrollHeight="500px" />
-      </div>
-
-      <div style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}>
-        <button
-          id="generate-pdf-btn"
-          onClick={handleGeneratePDF}
-          style={{ padding: "10px 20px", fontSize: "14px" }}
-        >
-          Generar PDF
-        </button>
-      </div>
-    </div>
+          {/* botón PDF */}
+          <CRow className="mt-4">
+            <CCol className="text-center">
+              <CButton
+                color="success"
+                className="px-5 py-2 shadow-lg"
+                id="generate-pdf-btn"
+                onClick={handleGeneratePDF}
+                style={{ background: 'linear-gradient(90deg, #56ab2f, #a8e063)', border: 'none', borderRadius: '8px' }}
+              >
+                Generar PDF
+              </CButton>
+            </CCol>
+          </CRow>
+        </CCardBody>
+      </CCard>
+    </CContainer>
   );
 }
 
