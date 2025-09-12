@@ -58,6 +58,17 @@ export const empleados = [
     registros: [
       { fecha: new Date("2025-08-14"), dia: "Jueves", h01: "08:00", h02: "10:15", h03: "11:30", h04: "12:45", total: "04:45" },
       { fecha: new Date("2025-08-17"), dia: "Domingo", h01: "09:30", h02: "11:40", h03: "12:50", total: "03:20" },
+      { fecha: new Date("2025-08-18"), dia: "Lunes", h01: "08:15", h02: "10:30", h03: "11:45", h04: "13:00", total: "04:30" },
+      { fecha: new Date("2025-08-19"), dia: "Martes", h01: "08:10", h02: "10:20", h03: "11:35", h04: "12:50", total: "04:05" },
+      { fecha: new Date("2025-08-20"), dia: "Miércoles", h01: "08:00", h02: "10:15", h03: "11:25", h04: "12:40", total: "04:00" },
+      { fecha: new Date("2025-08-21"), dia: "Jueves", h01: "08:05", h02: "10:10", h03: "11:20", h04: "12:35", total: "04:05" },
+      { fecha: new Date("2025-08-22"), dia: "Viernes", h01: "08:00", h02: "10:15", h03: "11:30", h04: "12:45", total: "04:45" },
+      { fecha: new Date("2025-08-23"), dia: "Sábado", h01: "09:00", h02: "11:10", h03: "12:20", total: "03:30" },
+      { fecha: new Date("2025-08-24"), dia: "Domingo", h01: "09:30", h02: "11:40", h03: "12:50", total: "03:20" },
+      { fecha: new Date("2025-08-25"), dia: "Lunes", h01: "08:10", h02: "10:25", h03: "11:35", h04: "12:50", total: "04:10" },
+      { fecha: new Date("2025-08-26"), dia: "Martes", h01: "08:05", h02: "10:15", h03: "11:25", h04: "12:40", total: "04:05" },
+      { fecha: new Date("2025-08-27"), dia: "Miércoles", h01: "08:00", h02: "10:10", h03: "11:20", h04: "12:35", total: "04:05" },
+
     ]
   },
 ];
