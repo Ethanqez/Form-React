@@ -30,6 +30,7 @@ h2 {
   padding: 7px;
 }
 
+/* contenedor superior */
 .contenedor {
   display: flex;
   justify-content: space-between;
@@ -49,10 +50,69 @@ input {
   box-sizing: border-box;
 }
 
-.boton{
-   background-color: white;
-   border-color: rgba(0, 0, 0, 0.525);
-   color:rgba(0, 0, 0, 0.438);
-   border-radius: 5px;
+/* botones base */
+.boton {
+  background-color: white;
+  border-color: rgba(0, 0, 0, 0.525);
+  color: rgba(0, 0, 0, 0.438);
+  border-radius: 5px;
 }
 
+
+.grupo input[type="date"] {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.grupo input[type="date"]:focus {
+  border-color: #2193b0;
+  box-shadow: 0 0 8px rgba(33, 147, 176, 0.4);
+  outline: none;
+}
+
+/* header animado */
+.card-header {
+  background: linear-gradient(270deg, #2193b0, #6dd5ed, #56ab2f, #a8e063);
+  background-size: 800% 800%;
+  animation: gradientMove 12s ease infinite;
+}
+
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.rdt_TableRow:hover {
+  background-color: #f1faff !important;
+  transition: background 0.2s ease;
+}
+
+/* botones con hover */
+button, .btn, .boton {
+  transition: all 0.3s ease;
+  font-weight: 600;
+}
+
+button:hover, .btn:hover, .boton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+}
+
+/* centrar botón PDF */
+#generate-pdf-btn {
+  display: block;
+  margin: 20px auto;
+  font-size: 16px;
+  padding: 10px 30px;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #56ab2f, #a8e063);
+  color: white;
+  border: none;
+}
+
+#generate-pdf-btn:hover {
+  background: linear-gradient(90deg, #43cea2, #185a9d);
+}

@@ -213,7 +213,7 @@ function App() {
 
 
       <br/>
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+      <div >
         <input 
           className="boton" 
           type='button' 
