@@ -1,14 +1,14 @@
-import {Document, Text, Page, StyleSheet} from "@react-pdf/render";
+import {document, text, page, styleSheet} from "@react-pdf/render";
 
 function PDF(){
     return(
-        <Document>
+        <document>
             <page>
-                <Text>
+                <text>
                     Hola chamo
-                </Text>
+                </text>
             </page>
-        </Document>
+        </document>
     )
 }
 
