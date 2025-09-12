@@ -81,9 +81,9 @@ const empleados = [
     "RAMÍREZ TORRES PABLO ENRIQUE"
   ];
 
- 
+ console.log("queti")
 
-  const [selectEmpleado, setSelectEpleado] = useState(data);
+  const [selectEmpleado] = useState(data);
   const [registro, setRegistro] = useState(data);
   const fechaI = useRef();
   const fechaF = useRef();
