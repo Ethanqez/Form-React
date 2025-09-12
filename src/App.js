@@ -27,9 +27,9 @@ function App() {
     { name: <b>H07</b>, selector: row => row.h07 },
     { name: <b>H08</b>, selector: row => row.h08 },
     { name: <b>TOTAL (Horas)</b>, selector: row => row.total },
-    { 
-      name: <b>Empleado</b>, 
-      selector: row => row.empleado, 
+    {
+      name: <b>Empleado</b>,
+      selector: row => row.empleado,
       cell: row => (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
           {row.empleado.split(' ').map((palabra, i) => <div key={i}>{palabra}</div>)}
@@ -165,17 +165,17 @@ const empleados = [
           <CRow className="mb-3">
             <CCol>
               <label>Empleado</label>
-              <CFormSelect onChange={handleChange} className="shadow-sm">
+              <CFormSelect onChange={handleChange}>
                 <option value=""></option>
                 {empleados.map((emp, index) => <option key={index} value={emp.nombre}>{emp.nombre}</option>)}
               </CFormSelect>
             </CCol>
           </CRow>
 
-          {/* Botón Mostrar */}
+          {/* Botón Mostrar Marcaciones */}
           <CRow className="mb-3">
-            <CCol className="text-center">
-              <CButton color="info" className="px-4 shadow-sm" onClick={handleFilterByDate}>
+            <CCol className="text-center" style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
+              <CButton color="info" className="px-4" onClick={handleFilterByDate} style={{ height: "40px", textAlign: 'center', fontSize: "14px", margin: "10px", width: "177px" }}>
                 Mostrar Marcaciones
               </CButton>
             </CCol>
@@ -197,12 +197,12 @@ const empleados = [
             />
           </div>
 
-          {/* botón PDF */}
+          {/* Botón PDF */}
           <CRow className="mt-4">
             <CCol className="text-center">
               <CButton
                 color="success"
-                className="px-5 py-2 shadow-lg"
+                className="px-5 py-2"
                 id="generate-pdf-btn"
                 onClick={handleGeneratePDF}
                 style={{ background: 'linear-gradient(90deg, #56ab2f, #a8e063)', border: 'none', borderRadius: '8px' }}
