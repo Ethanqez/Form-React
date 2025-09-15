@@ -1,16 +1,14 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Document, Page, Text, View, StyleSheet, PDFViewer, PDFDownloadLink } from '@react-pdf/renderer';
 import {
   CButton,
   CCard,
   CCardBody,
   CCardHeader,
-  CFormSelect,
   CContainer,
   CRow,
   CCol,
 } from '@coreui/react';
-import { empleados } from './empleados';
 
 // Estilos para el PDF
 const styles = StyleSheet.create({
@@ -49,7 +47,6 @@ const styles = StyleSheet.create({
     fontSize: 9,
     color: '#666',
   },
-  // Sección específica para mostrar empleados cuando hay múltiples
   employeeSection: {
     marginBottom: 15,
     backgroundColor: '#e3f2fd',
@@ -104,6 +101,18 @@ const styles = StyleSheet.create({
     fontSize: 7,
     textAlign: 'center',
   },
+  totalSection: {
+    marginTop: 10,
+    padding: 8,
+    backgroundColor: '#f0f8ff',
+    borderRadius: 4,
+  },
+  totalText: {
+    fontSize: 9,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    color: '#2193b0',
+  },
 });
 
 // Componente del documento PDF
@@ -127,6 +136,26 @@ const PDFDocument = ({ registros, empleadoSeleccionado, fechaInicio, fechaFin })
     }
     
     return "TODOS LOS EMPLEADOS";
+  };
+
+  const getFechaRange = () => {
+    if (fechaInicio && fechaFin) {
+      return `${new Date(fechaInicio).toLocaleDateString('es-ES')} - ${new Date(fechaFin).toLocaleDateString('es-ES')}`;
+    } else if (fechaInicio) {
+      return `Desde: ${new Date(fechaInicio).toLocaleDateString('es-ES')}`;
+    } else if (fechaFin) {
+      return `Hasta: ${new Date(fechaFin).toLocaleDateString('es-ES')}`;
+    } else {
+      return "Todos los períodos";
+    }
+  };
+
+  // Función para calcular total de horas
+  const calcularTotalHoras = (registrosEmpleado) => {
+    const totalDecimal = registrosEmpleado.reduce((total, reg) => total + reg.totalDecimal, 0);
+    const horas = Math.floor(totalDecimal);
+    const minutos = Math.round((totalDecimal - horas) * 60);
+    return `${horas.toString().padStart(2, '0')} horas ${minutos.toString().padStart(2, '0')} minutos`;
   };
 
   // Verificar si necesitamos mostrar múltiples empleados
@@ -156,14 +185,7 @@ const PDFDocument = ({ registros, empleadoSeleccionado, fechaInicio, fechaFin })
                 Empleado: {getEmpleadoInfo()}
               </Text>
               <Text style={styles.date}>
-                {fechaInicio && fechaFin 
-                  ? `${new Date(fechaInicio).toLocaleDateString('es-ES')} - ${new Date(fechaFin).toLocaleDateString('es-ES')}`
-                  : fechaInicio 
-                  ? `Desde: ${new Date(fechaInicio).toLocaleDateString('es-ES')}`
-                  : fechaFin
-                  ? `Hasta: ${new Date(fechaFin).toLocaleDateString('es-ES')}`
-                  : console.log("Desde: "+ fechaInicio,fechaFin)
-                }
+                {getFechaRange()}
               </Text>
             </View>
             <View>
@@ -267,6 +289,16 @@ const PDFDocument = ({ registros, empleadoSeleccionado, fechaInicio, fechaFin })
               ))}
             </View>
 
+            {/* Sección de totales */}
+            <View style={styles.totalSection}>
+              <Text style={styles.totalText}>
+                TOTAL DE HORAS: {calcularTotalHoras(registrosEmpleado)}
+              </Text>
+              <Text style={styles.totalText}>
+                DÍAS TRABAJADOS: {registrosEmpleado.length}
+              </Text>
+            </View>
+
             {/* Espacio entre empleados */}
             {esMultipleEmpleados && empleadoIndex < Object.keys(registrosAgrupados).length - 1 && (
               <View style={{ marginBottom: 20 }} />
@@ -278,84 +310,17 @@ const PDFDocument = ({ registros, empleadoSeleccionado, fechaInicio, fechaFin })
   );
 };
 
-// Componente principal PDFInterface
-const PDFInterface = ({ registros, onBack }) => {
-  const [empleadoSeleccionado, setEmpleadoSeleccionado] = useState("");
-  const [fechaInicio, setFechaInicio] = useState("");
-  const [fechaFin, setFechaFin] = useState("");
-  const [registrosFiltrados, setRegistrosFiltrados] = useState(registros);
-
-  const handleEmpleadoChange = (e) => {
-    const nombre = e.target.value;
-    setEmpleadoSeleccionado(nombre);
-    
-    let filtrados = registros;
-    if (!nombre) { 
-      setEmpleadoSeleccionado(empleadoSeleccionado); 
-      return; 
-    }
-
-    const emp = empleados.find(emp => emp.nombre === nombre);
-    if (emp) {
-      setEmpleadoSeleccionado(emp.registros.map(r => ({ ...r, empleado: emp.nombre })));
-    }
-
-    if (nombre) {
-      filtrados = filtrados.filter(reg => reg.empleado === nombre);
-    }
-    
-    if (fechaInicio || fechaFin) {
-      const inicio = fechaInicio ? new Date(fechaInicio) : null;
-      const fin = fechaFin ? new Date(fechaFin) : null;
-      
-      filtrados = filtrados.filter(registro => {
-        const fechaReg = new Date(registro.fecha);
-        if (inicio && fin) {
-          return fechaReg >= inicio && fechaReg <= fin;
-        } else if (inicio) {
-          return fechaReg >= inicio;
-        } else if (fin) {
-          return fechaReg <= fin;
-        }
-        return true;
-      });
-    }
-    
-    setRegistrosFiltrados(filtrados);
-  };
-
-  const handleFechaChange = () => {
-    let filtrados = registros;
-    
-    if (empleadoSeleccionado) {
-      filtrados = filtrados.filter(reg => reg.empleado === empleadoSeleccionado);
-    }
-    
-    if (fechaInicio || fechaFin) {
-      const inicio = fechaInicio ? new Date(fechaInicio) : null;
-      const fin = fechaFin ? new Date(fechaFin) : null;
-    }
-    
-    setRegistrosFiltrados(filtrados);
-  };
-
-  const resetFilters = () => {
-    setEmpleadoSeleccionado("");
-    setFechaInicio("");
-    setFechaFin("");
-    setRegistrosFiltrados(registros);
-  };
-
-  // Obtener lista única de empleados de los registros
-  const empleadosUnicos = [...new Set(registros.map(reg => reg.empleado))];
+// Componente principal PDFInterface simplificado
+const PDFInterface = ({ savedConfiguration, onBack }) => {
+  const { registros, empleado, fechaInicio, fechaFin } = savedConfiguration;
 
   // Función para obtener el nombre del empleado para el filename
   const getEmpleadoParaFilename = () => {
-    if (empleadoSeleccionado) {
-      return empleadoSeleccionado.replace(/\s+/g, '_').substring(0, 20);
+    if (empleado) {
+      return empleado.replace(/\s+/g, '_').substring(0, 20);
     }
     
-    const empleadosUnicos = [...new Set(registrosFiltrados.map(reg => reg.empleado))];
+    const empleadosUnicos = [...new Set(registros.map(reg => reg.empleado))];
     if (empleadosUnicos.length === 1) {
       return empleadosUnicos[0].replace(/\s+/g, '_').substring(0, 20);
     }
@@ -380,67 +345,36 @@ const PDFInterface = ({ registros, onBack }) => {
         </CCardHeader>
         <CCardBody style={{ backgroundColor: '#f8f9fa' }}>
           
-          {/* Controles de filtros */}
+          {/* Información de la configuración actual */}
           <CRow className="mb-3">
-            <CCol md={5}>
-              <label><strong>Filtrar por Empleado</strong></label>
-              <CFormSelect 
-                value={empleadoSeleccionado} 
-                onChange={handleEmpleadoChange}
-
-              >
-                <option value="">Todos los empleados</option>
-                {empleados.map((emp, index) => (
-                  <option key={index} value={emp.nombre}>
-                    {emp.nombre}
-                  </option>
-                ))}
-              </CFormSelect>
-            </CCol>
-            <CCol md={4}>
-              <label><strong>Fecha Inicio</strong></label>
-              <input 
-                type="date" 
-                value={fechaInicio}
-                onChange={(e) => {
-                  setFechaInicio(e.target.value);
-                  setTimeout(handleFechaChange, 100);
-                }}
-                className="form-control form-control-sm"
-              />
-            </CCol>
-            <CCol md={3}>
-              <label><strong>Fecha Fin</strong></label>
-              <input 
-                type="date" 
-                value={fechaFin}
-                onChange={(e) => {
-                  setFechaFin(e.target.value);
-                  setTimeout(handleFechaChange, 100);
-                }}
-                className="form-control form-control-sm"
-              />
-            </CCol>
-            <CCol md={2} className="d-flex align-items-end">
-              <CButton 
-                color="warning" 
-                onClick={resetFilters}
-                size="sm"
-                style={{ width: '100%' }}
-              >
-                Limpiar
-              </CButton>
+            <CCol className="text-center">
+              <div style={{ 
+                backgroundColor: '#e3f2fd', 
+                padding: '10px', 
+                borderRadius: '8px',
+                marginBottom: '15px'
+              }}>
+                <strong style={{ color: '#2193b0' }}>Configuración del Reporte:</strong>
+                <br />
+                <span style={{ fontSize: '14px' }}>
+                  Empleado: {empleado || "Todos los empleados"} | 
+                  Registros: {registros.length} | 
+                  Período: {fechaInicio && fechaFin ? 
+                    `${new Date(fechaInicio).toLocaleDateString('es-ES')} - ${new Date(fechaFin).toLocaleDateString('es-ES')}` : 
+                    "Todas las fechas"}
+                </span>
+              </div>
             </CCol>
           </CRow>
 
-          {/* Botones de acción */}
+          {/* Botón de descarga */}
           <CRow className="mb-3">
             <CCol className="text-center">
               <PDFDownloadLink
                 document={
                   <PDFDocument 
-                    registros={registrosFiltrados} 
-                    empleadoSeleccionado={empleadoSeleccionado}
+                    registros={registros} 
+                    empleadoSeleccionado={empleado}
                     fechaInicio={fechaInicio}
                     fechaFin={fechaFin}
                   />
@@ -452,25 +386,16 @@ const PDFInterface = ({ registros, onBack }) => {
                     color="success"
                     disabled={loading}
                     style={{ 
-                      marginRight: '10px',
                       background: 'linear-gradient(90deg, #28a745, #20c997)',
-                      border: 'none'
+                      border: 'none',
+                      fontSize: '16px',
+                      padding: '12px 30px'
                     }}
                   >
-                    {loading ? 'Generando PDF...' : '📥 Descargar PDF'}
+                    {loading ? 'Generando PDF...' : 'Descargar PDF'}
                   </CButton>
                 }
               </PDFDownloadLink>
-              
-              <span style={{ 
-                fontSize: '14px', 
-                color: '#666',
-                backgroundColor: '#e9ecef',
-                padding: '8px 12px',
-                borderRadius: '4px'
-              }}>
-                📊 {registrosFiltrados.length} registros para generar
-              </span>
             </CCol>
           </CRow>
 
@@ -489,8 +414,8 @@ const PDFInterface = ({ registros, onBack }) => {
               }}
             >
               <PDFDocument 
-                registros={registrosFiltrados} 
-                empleadoSeleccionado={empleadoSeleccionado}
+                registros={registros} 
+                empleadoSeleccionado={empleado}
                 fechaInicio={fechaInicio}
                 fechaFin={fechaFin}
               />

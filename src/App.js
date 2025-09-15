@@ -14,54 +14,103 @@ import PDFInterface from './PDFInterface';
 import { empleados } from './empleados';
 
 function App() {
-  const allRegistros = empleados.flatMap(emp =>
-    emp.registros.map(r => ({ ...r, empleado: emp.nombre }))
-  );
+  // Adaptar a la nueva estructura de datos
+  const allRegistros = empleados.map(emp => ({
+    fecha: new Date(emp.fecha.split('/').reverse().join('/')), // Convertir dd/mm/yyyy a Date
+    dia: emp.DiaSemana,
+    h01: emp.H01,
+    h02: emp.H02,
+    h03: emp.H03,
+    h04: emp.H04,
+    h05: emp.H05,
+    h06: emp.H06,
+    h07: emp.H07,
+    h08: emp.H08,
+    total: emp.totHoraMin,
+    totalDecimal: emp.total,
+    empleado: emp.Empleado
+  }));
 
   const [registro, setRegistro] = useState(allRegistros);
   const [empleadoSeleccionado, setEmpleadoSeleccionado] = useState("");
   const [showPDFInterface, setShowPDFInterface] = useState(false);
+  
+  // Estados para la configuración guardada
+  const [configurationSaved, setConfigurationSaved] = useState(false);
+  const [savedConfiguration, setSavedConfiguration] = useState({
+    registros: [],
+    empleado: "",
+    fechaInicio: "",
+    fechaFin: ""
+  });
+  
   const fechaI = useRef();
   const fechaF = useRef();
+
+  // Nueva función unificada de filtrado
+  const applyFilters = () => {
+    let filtrados = allRegistros;
+    
+    // Aplicar filtro por empleado si está seleccionado
+    if (empleadoSeleccionado) {
+      filtrados = filtrados.filter(reg => reg.empleado === empleadoSeleccionado);
+    }
+    
+    // Aplicar filtro por fechas si están definidas
+    const startValue = fechaI.current?.value;
+    const endValue = fechaF.current?.value;
+    
+    if (startValue && endValue) {
+      const start = new Date(startValue);
+      const end = new Date(endValue);
+      filtrados = filtrados.filter(registro => {
+        return registro.fecha >= start && registro.fecha <= end;
+      });
+    }
+    
+    setRegistro(filtrados);
+  };
 
   const handleChange = (e) => {
     const nombre = e.target.value;
     setEmpleadoSeleccionado(nombre);
-    if (!nombre) { 
-      setRegistro(allRegistros); 
-      return; 
-    }
-    const emp = empleados.find(emp => emp.nombre === nombre);
-    if (emp) {
-      setRegistro(emp.registros.map(r => ({ ...r, empleado: emp.nombre })));
-    }
+    setConfigurationSaved(false);
+    
+    // Aplicar filtros combinados
+    setTimeout(() => applyFilters(), 0);
   };
 
   const handleFilterByDate = () => {
-    const startValue = fechaI.current.value;
-    const endValue = fechaF.current.value;
-
-    if (!startValue || !endValue) {
-      setRegistro(allRegistros);
-      return;
-    }
-
-    const start = new Date(startValue);
-    const end = new Date(endValue);
-    const filtrados = allRegistros.filter(registro => {
-      const fechaRegistro = new Date(registro.fecha);
-      return fechaRegistro >= start && fechaRegistro <= end;
-    });
-
-    setRegistro(filtrados);
+    setConfigurationSaved(false);
+    
+    // Aplicar filtros combinados
+    applyFilters();
   };
 
   const handleMostrar = () => {
     setRegistro(allRegistros);
     setEmpleadoSeleccionado("");
-    fechaI.current.value = "";
-    fechaF.current.value = "";
+    if (fechaI.current) fechaI.current.value = "";
+    if (fechaF.current) fechaF.current.value = "";
+    setConfigurationSaved(false);
   };
+
+  // Nueva función para guardar la configuración
+  const handleSaveConfiguration = () => {
+    const startValue = fechaI.current?.value || "";
+    const endValue = fechaF.current?.value || "";
+    
+    setSavedConfiguration({
+      registros: registro,
+      empleado: empleadoSeleccionado,
+      fechaInicio: startValue,
+      fechaFin: endValue
+    });
+    setConfigurationSaved(true);
+  };
+
+  // Obtener lista única de empleados
+  const empleadosUnicos = [...new Set(allRegistros.map(reg => reg.empleado))].sort();
 
   const handleShowPDFInterface = () => {
     setShowPDFInterface(true);
@@ -71,16 +120,14 @@ function App() {
     setShowPDFInterface(false);
   };
 
-
   if (showPDFInterface) {
     return (
       <PDFInterface 
-        registros={registro} 
+        savedConfiguration={savedConfiguration}
         onBack={handleBackToMain}
       />
     );
   }
-
 
   return (
     <CContainer className="py-5">
@@ -104,6 +151,10 @@ function App() {
                   border: '1px solid #ccc',
                   marginLeft: '10px'
                 }} 
+                onChange={() => {
+                  setConfigurationSaved(false);
+                  setTimeout(() => applyFilters(), 0);
+                }}
               />
             </div>
             <div>
@@ -119,6 +170,10 @@ function App() {
                   border: '1px solid #ccc',
                   marginLeft: '10px'
                 }} 
+                onChange={() => {
+                  setConfigurationSaved(false);
+                  setTimeout(() => applyFilters(), 0);
+                }}
               />
             </div>
             <CButton 
@@ -137,9 +192,9 @@ function App() {
                 <option value="" hidden>
                   Seleccione un empleado
                 </option>
-                {empleados.map((emp, index) => (
-                  <option key={index} value={emp.nombre}>
-                    {emp.nombre}
+                {empleadosUnicos.map((empleado, index) => (
+                  <option key={index} value={empleado}>
+                    {empleado}
                   </option>
                 ))}
               </CFormSelect>
@@ -161,22 +216,63 @@ function App() {
                 >
                   Mostrar Todas las Marcaciones
                 </CButton>
-                
+
                 <CButton 
-                  color="success" 
-                  onClick={handleShowPDFInterface}
+                  color="warning" 
+                  onClick={handleSaveConfiguration}
                   style={{ 
                     height: "45px", 
                     fontSize: "14px", 
                     width: "180px",
-                    background: 'linear-gradient(90deg, #56ab2f, #a8e063)',
-                    border: 'none',
                     borderRadius: "8px"
+                  }}
+                >
+                  Guardar Configuración
+                </CButton>
+                
+                <CButton 
+                  color="success" 
+                  onClick={handleShowPDFInterface}
+                  disabled={!configurationSaved}
+                  style={{ 
+                    height: "45px", 
+                    fontSize: "14px", 
+                    width: "180px",
+                    background: configurationSaved ? 'linear-gradient(90deg, #56ab2f, #a8e063)' : '#ccc',
+                    border: 'none',
+                    borderRadius: "8px",
+                    cursor: configurationSaved ? 'pointer' : 'not-allowed'
                   }}
                 >
                   Ver Vista Previa PDF
                 </CButton>
               </div>
+              
+              {configurationSaved && (
+                <div style={{ 
+                  marginTop: '10px', 
+                  padding: '8px', 
+                  backgroundColor: '#d4edda', 
+                  color: '#155724', 
+                  borderRadius: '4px',
+                  fontSize: '14px'
+                }}>
+                  Configuración guardada correctamente. Puede proceder a generar el PDF.
+                </div>
+              )}
+              
+              {!configurationSaved && (
+                <div style={{ 
+                  marginTop: '10px', 
+                  fontSize: '12px',
+                  color: '#856404',
+                  backgroundColor: '#fff3cd',
+                  padding: '8px',
+                  borderRadius: '4px'
+                }}>
+                  Debe guardar la configuración antes de generar el PDF.
+                </div>
+              )}
             </CCol>
           </CRow>
 
@@ -212,7 +308,7 @@ function App() {
                       <span>{reg.fecha.toLocaleDateString('es-ES')} - {reg.dia}</span>
                     </div>
                     <div style={{ textAlign: 'right' }}>
-                      <strong>Total: {reg.total} horas</strong>
+                      <strong>Total: {reg.total}</strong>
                       <br />
                       <small>
                         {[reg.h01, reg.h02, reg.h03, reg.h04, reg.h05, reg.h06, reg.h07, reg.h08]
