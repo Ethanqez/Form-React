@@ -1,107 +1,41 @@
-body {
-  background: #ffffff;
-  color: black;
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+.pdf-interface-container {
+  width: 100%;
+  max-width: 1000px; /* ancho similar a App.js */
+  margin: 20px auto; /* centrado */
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.filters-container {
   display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
   justify-content: center;
-  align-items: center;
-  min-height: 100vh;
+  width: 100%;
+  margin-bottom: 20px;
 }
 
-label {
-  display: block;
+.filters-container .group {
+  flex: 1 1 200px;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
-}
-
-h2 {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 15px;
-  padding: 7px;
-}
-
-/* contenedor superior */
-.contenedor {
-  display: flex;
-  justify-content: space-between;
-  gap: 670px; 
-}
-
-.grupo {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-}
-
-input {
+input, select {
   padding: 8px;
   font-size: 16px;
   width: 100%;
   box-sizing: border-box;
-}
-
-/* botones base */
-.boton {
-  background-color: white;
-  border-color: rgba(0, 0, 0, 0.525);
-  color: rgba(0, 0, 0, 0.438);
-  border-radius: 5px;
-}
-
-
-.grupo input[type="date"] {
   border: 1px solid #ccc;
   border-radius: 8px;
   transition: all 0.3s ease;
   box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
-.grupo input[type="date"]:focus {
+input:focus, select:focus {
   border-color: #2193b0;
-  box-shadow: 0 0 8px rgba(33, 147, 176, 0.4);
+  box-shadow: 0 0 8px rgba(33,147,176,0.4);
   outline: none;
 }
 
-/* header animado */
-.card-header {
-  background: linear-gradient(270deg, #2193b0, #6dd5ed, #56ab2f, #a8e063);
-  background-size: 800% 800%;
-  animation: gradientMove 12s ease infinite;
-}
-
-@keyframes gradientMove {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-.rdt_TableRow:hover {
-  background-color: #f1faff !important;
-  transition: background 0.2s ease;
-}
-
-/* botones con hover */
-button, .btn, .boton {
-  transition: all 0.3s ease;
-  font-weight: 600;
-}
-
-button:hover, .btn:hover, .boton:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 15px rgba(0,0,0,0.15);
-}
-
-/* centrar botón PDF */
 #generate-pdf-btn {
   display: block;
   margin: 20px auto;
@@ -111,8 +45,45 @@ button:hover, .btn:hover, .boton:hover {
   background: linear-gradient(90deg, #56ab2f, #a8e063);
   color: white;
   border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
 }
 
 #generate-pdf-btn:hover {
   background: linear-gradient(90deg, #43cea2, #185a9d);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+}
+
+.pdf-viewer-container {
+  width: 100%;
+  height: 70vh;
+  border: 2px solid #dee2e6;
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 20px auto;
+}
+
+/* Media queries */
+@media (max-width: 991px) {
+  .filters-container {
+    flex-direction: column;
+  }
+  .pdf-viewer-container {
+    height: 60vh;
+  }
+}
+
+@media (max-width: 576px) {
+  .pdf-viewer-container {
+    height: 50vh;
+  }
+  input, select {
+    font-size: 14px;
+  }
+  #generate-pdf-btn {
+    font-size: 14px;
+    padding: 8px 20px;
+  }
 }
