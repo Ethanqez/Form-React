@@ -80,9 +80,11 @@ function App() {
       />
     );
   }
+const selectedEmployee = empleados.find(emp => emp.nombre === empleadoSeleccionado);
 
 
   return (
+    
     <CContainer className="py-5">
       <CCard className="shadow-lg border-0">
         <CCardHeader className="text-white" style={{ background: 'linear-gradient(90deg, #2193b0, #6dd5ed)' }}>
