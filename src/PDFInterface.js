@@ -1,6 +1,5 @@
 import React from 'react';
 import { Document, Page, Text, View, StyleSheet, PDFViewer, PDFDownloadLink } from '@react-pdf/renderer';
-
 import {
   CButton,
   CCard,
@@ -70,7 +69,8 @@ const styles = StyleSheet.create({
     borderRightWidth: 0,
     borderBottomWidth: 0,
   },
-  subHeader: {
+  tableRow: {
+    margin: 'auto',
     flexDirection: 'row',
   },
   tableColHeader: {
@@ -127,14 +127,14 @@ const PDFDocument = ({ registros, empleadoSeleccionado, fechaInicio, fechaFin })
     if (empleadoSeleccionado) {
       return empleadoSeleccionado;
     }
-    
+
     // Si no hay empleado seleccionado, verificar si todos los registros son del mismo empleado
     const empleadosUnicos = [...new Set(registros.map(reg => reg.empleado))];
-    
+
     if (empleadosUnicos.length === 1) {
       return empleadosUnicos[0];
     }
-    
+
     return "TODOS LOS EMPLEADOS";
   };
 
@@ -193,15 +193,6 @@ const PDFDocument = ({ registros, empleadoSeleccionado, fechaInicio, fechaFin })
                 Fecha de emisión: {getCurrentDate()}
               </Text>
             </View>
-          </View>
-          
-          <View style={styles.userKeySection}>
-            <Text style={styles.userKeyLabel}>Clave Usuario</Text>
-            <Text style={styles.userKey}>1202</Text>
-          </View>
-          
-          <View style={styles.dateSection}>
-            <Text style={styles.dateText}>{getCurrentDateSpanish()}</Text>
           </View>
         </View>
 
@@ -328,17 +319,17 @@ const PDFInterface = ({ savedConfiguration, onBack }) => {
     if (empleado) {
       return empleado.replace(/\s+/g, '_').substring(0, 20);
     }
-    
+
     const empleadosUnicos = [...new Set(registros.map(reg => reg.empleado))];
     if (empleadosUnicos.length === 1) {
       return empleadosUnicos[0].replace(/\s+/g, '_').substring(0, 20);
     }
-    
+
     return 'todos';
   };
 
   return (
-    <CContainer className="py-3" fluid>
+    <CContainer className="py-3">
       <CCard className="shadow-lg border-0">
         <CCardHeader className="text-white" style={{ background: 'linear-gradient(90deg, #2193b0, #6dd5ed)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -353,7 +344,7 @@ const PDFInterface = ({ savedConfiguration, onBack }) => {
           </div>
         </CCardHeader>
         <CCardBody style={{ backgroundColor: '#f8f9fa' }}>
-          
+
           {/* Información de la configuración actual */}
           <CRow className="mb-3">
             <CCol className="text-center">
