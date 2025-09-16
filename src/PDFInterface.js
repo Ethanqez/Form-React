@@ -1,6 +1,5 @@
 import React from 'react';
 import { Document, Page, Text, View, StyleSheet, PDFViewer, PDFDownloadLink } from '@react-pdf/renderer';
-import { formatDate, getDayAbbr, getCurrentDateSpanish, timeToDecimal } from '../utils/dateUtils';
 
 import {
   CButton,
