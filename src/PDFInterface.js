@@ -1,438 +1,349 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Document, Page, Text, View, StyleSheet, PDFViewer, PDFDownloadLink } from '@react-pdf/renderer';
+import { formatDate, getDayAbbr, getCurrentDateSpanish, timeToDecimal } from '../utils/dateUtils';
+
 import {
   CButton,
   CCard,
   CCardBody,
   CCardHeader,
-  CFormSelect,
   CContainer,
   CRow,
   CCol,
 } from '@coreui/react';
-import { empleados } from './empleados';
 
-// Estilos para el PDF - Replicando el diseño original
+// Estilos para el PDF
 const styles = StyleSheet.create({
   page: {
     flexDirection: 'column',
     backgroundColor: '#ffffff',
-    padding: 30,
-    fontSize: 10,
+    padding: 20,
+    fontSize: 8,
   },
   header: {
-    marginBottom: 15,
+    marginBottom: 20,
+    borderBottom: 2,
+    borderBottomColor: '#2193b0',
     paddingBottom: 10,
   },
-  employeeSection: {
-    flexDirection: 'row',
-    marginBottom: 10,
-  },
-  employeeLabel: {
-    fontSize: 12,
+  title: {
+    fontSize: 14,
     fontWeight: 'bold',
-    width: 80,
-    textAlign: 'left',
+    textAlign: 'center',
+    marginBottom: 5,
+    color: '#2193b0',
+  },
+  employeeInfo: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+    backgroundColor: '#f8f9fa',
+    padding: 8,
+    borderRadius: 4,
   },
   employeeName: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    borderBottom: 2,
-    borderBottomColor: '#000',
-    paddingBottom: 2,
-    flex: 1,
-    paddingLeft: 10,
-  },
-  userKeySection: {
-    flexDirection: 'row',
-    marginBottom: 15,
-  },
-  userKeyLabel: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    width: 80,
-  },
-  userKey: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    paddingLeft: 10,
-  },
-  dateSection: {
-    textAlign: 'right',
-    marginBottom: 20,
-  },
-  dateText: {
     fontSize: 10,
+    fontWeight: 'bold',
+  },
+  date: {
+    fontSize: 9,
+    color: '#666',
+  },
+  employeeSection: {
+    marginBottom: 15,
+    backgroundColor: '#e3f2fd',
+    padding: 10,
+    borderRadius: 4,
+  },
+  employeeSectionTitle: {
+    fontSize: 11,
+    fontWeight: 'bold',
+    color: '#2193b0',
+    marginBottom: 8,
+    textAlign: 'center',
   },
   table: {
     display: 'table',
     width: 'auto',
     borderStyle: 'solid',
-    borderWidth: 2,
-    borderColor: '#000',
-    marginTop: 10,
-  },
-  tableHeader: {
-    margin: 'auto',
-    flexDirection: 'row',
-    backgroundColor: '#f0f0f0',
-    borderBottomWidth: 1,
-    borderBottomColor: '#000',
-  },
-  tableRow: {
-    margin: 'auto',
-    flexDirection: 'row',
-    borderBottomWidth: 1,
-    borderBottomColor: '#000',
-  },
-  // Columnas específicas
-  colDia: {
-    width: '6%',
-    borderStyle: 'solid',
-    borderRightWidth: 1,
-    borderRightColor: '#000',
-    borderLeftWidth: 0,
-    borderTopWidth: 0,
-    borderBottomWidth: 0,
-  },
-  colFecha: {
-    width: '12%',
-    borderStyle: 'solid',
-    borderRightWidth: 1,
-    borderRightColor: '#000',
-    borderLeftWidth: 0,
-    borderTopWidth: 0,
-    borderBottomWidth: 0,
-  },
-  colHora: {
-    width: '6.5%',
-    borderStyle: 'solid',
-    borderRightWidth: 1,
-    borderRightColor: '#000',
-    borderLeftWidth: 0,
-    borderTopWidth: 0,
-    borderBottomWidth: 0,
-  },
-  colHorasTotal: {
-    width: '8%',
-    borderStyle: 'solid',
-    borderRightWidth: 1,
-    borderRightColor: '#000',
-    borderLeftWidth: 0,
-    borderTopWidth: 0,
-    borderBottomWidth: 0,
-  },
-  colHHmm: {
-    width: '8%',
-    borderStyle: 'solid',
+    borderWidth: 1,
+    borderColor: '#bfbfbf',
     borderRightWidth: 0,
-    borderLeftWidth: 0,
-    borderTopWidth: 0,
     borderBottomWidth: 0,
   },
-  cellHeader: {
+  subHeader: {
+    flexDirection: 'row',
+  },
+  tableColHeader: {
+    width: '9%',
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderColor: '#bfbfbf',
+    borderLeftWidth: 0,
+    borderTopWidth: 0,
+    backgroundColor: '#e3f2fd',
+  },
+  tableCol: {
+    width: '9%',
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderColor: '#bfbfbf',
+    borderLeftWidth: 0,
+    borderTopWidth: 0,
+  },
+  tableCellHeader: {
     margin: 2,
+    fontSize: 7,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  tableCell: {
+    margin: 2,
+    fontSize: 7,
+    textAlign: 'center',
+  },
+  totalSection: {
+    marginTop: 10,
+    padding: 8,
+    backgroundColor: '#f0f8ff',
+    borderRadius: 4,
+  },
+  totalText: {
     fontSize: 9,
     fontWeight: 'bold',
     textAlign: 'center',
-    padding: 3,
-  },
-  cellCenter: {
-    margin: 2,
-    fontSize: 9,
-    textAlign: 'center',
-    padding: 2,
-  },
-  cellLeft: {
-    margin: 2,
-    fontSize: 9,
-    textAlign: 'left',
-    padding: 2,
-  },
-  cellRight: {
-    margin: 2,
-    fontSize: 9,
-    textAlign: 'right',
-    padding: 2,
-  },
-  // Subcabecera de números
-  numberHeader: {
-    margin: 'auto',
-    flexDirection: 'row',
-    backgroundColor: '#f0f0f0',
-    borderBottomWidth: 1,
-    borderBottomColor: '#000',
-  },
-  colNumber: {
-    width: '6.5%',
-    borderStyle: 'solid',
-    borderRightWidth: 1,
-    borderRightColor: '#000',
-    borderLeftWidth: 0,
-    borderTopWidth: 0,
-    borderBottomWidth: 0,
-  },
-  spacerCol: {
-    width: '18%',
-    borderStyle: 'solid',
-    borderRightWidth: 1,
-    borderRightColor: '#000',
-    borderLeftWidth: 0,
-    borderTopWidth: 0,
-    borderBottomWidth: 0,
+    color: '#2193b0',
   },
 });
 
-// Función para convertir fecha a formato dd/mm/yyyy
-const formatDate = (date) => {
-  const d = new Date(date);
-  const day = String(d.getDate()).padStart(2, '0');
-  const month = String(d.getMonth() + 1).padStart(2, '0');
-  const year = d.getFullYear();
-  return `${day}/${month}/${year}`;
-};
-
-// Función para obtener día de la semana en español
-const getDayOfWeek = (date) => {
-  const days = ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'];
-  return days[new Date(date).getDay()];
-};
-
-// Función para convertir horas totales a formato HH:mm
-const formatTotalHours = (total) => {
-  if (!total) return '00:00';
-  return total.replace(':', ':');
-};
-
 // Componente del documento PDF
-const PDFDocument = ({ empleado, registros }) => {
+const PDFDocument = ({ registros, empleadoSeleccionado, fechaInicio, fechaFin }) => {
   const getCurrentDate = () => {
     const now = new Date();
-    const days = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
-    const months = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 
-                   'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
-    
-    return `${days[now.getDay()]}, ${now.getDate()} de ${months[now.getMonth()]} de ${now.getFullYear()}`;
+    return now.toLocaleDateString('es-ES');
   };
 
-  // Generar código de usuario (simulado)
-  const getUserCode = () => {
-    return "1202"; // Puedes hacerlo dinámico basado en el empleado
+  const getEmpleadoInfo = () => {
+    // Si hay un empleado seleccionado, mostrar su nombre
+    if (empleadoSeleccionado) {
+      return empleadoSeleccionado;
+    }
+    
+    // Si no hay empleado seleccionado, verificar si todos los registros son del mismo empleado
+    const empleadosUnicos = [...new Set(registros.map(reg => reg.empleado))];
+    
+    if (empleadosUnicos.length === 1) {
+      return empleadosUnicos[0];
+    }
+    
+    return "TODOS LOS EMPLEADOS";
   };
+
+  const getFechaRange = () => {
+    if (fechaInicio && fechaFin) {
+      return `${new Date(fechaInicio).toLocaleDateString('es-ES')} - ${new Date(fechaFin).toLocaleDateString('es-ES')}`;
+    } else if (fechaInicio) {
+      return `Desde: ${new Date(fechaInicio).toLocaleDateString('es-ES')}`;
+    } else if (fechaFin) {
+      return `Hasta: ${new Date(fechaFin).toLocaleDateString('es-ES')}`;
+    } else {
+      return "Todos los períodos";
+    }
+  };
+
+  // Función para calcular total de horas
+  const calcularTotalHoras = (registrosEmpleado) => {
+    const totalDecimal = registrosEmpleado.reduce((total, reg) => total + reg.totalDecimal, 0);
+    const horas = Math.floor(totalDecimal);
+    const minutos = Math.round((totalDecimal - horas) * 60);
+    return `${horas.toString().padStart(2, '0')} horas ${minutos.toString().padStart(2, '0')} minutos`;
+  };
+
+  // Verificar si necesitamos mostrar múltiples empleados
+  const empleadosUnicos = [...new Set(registros.map(reg => reg.empleado))];
+  const esMultipleEmpleados = empleadosUnicos.length > 1 && !empleadoSeleccionado;
+
+  // Agrupar registros por empleado si es necesario
+  const registrosAgrupados = esMultipleEmpleados 
+    ? registros.reduce((acc, reg) => {
+        if (!acc[reg.empleado]) {
+          acc[reg.empleado] = [];
+        }
+        acc[reg.empleado].push(reg);
+        return acc;
+      }, {})
+    : { [getEmpleadoInfo()]: registros };
 
   return (
     <Document>
       <Page size="A4" style={styles.page}>
-        {/* Header con información del empleado */}
+        {/* Header */}
         <View style={styles.header}>
-          <View style={styles.employeeSection}>
-            <Text style={styles.employeeLabel}>Empleado</Text>
-            <Text style={styles.employeeName}>{empleado?.nombre || 'EMPLEADO NO SELECCIONADO'}</Text>
+          <Text style={styles.title}>SISTEMA DE CONTROL DE MARCACIONES</Text>
+          <View style={styles.employeeInfo}>
+            <View>
+              <Text style={styles.employeeName}>
+                Empleado: {getEmpleadoInfo()}
+              </Text>
+              <Text style={styles.date}>
+                {getFechaRange()}
+              </Text>
+            </View>
+            <View>
+              <Text style={styles.date}>
+                Fecha de emisión: {getCurrentDate()}
+              </Text>
+            </View>
           </View>
           
           <View style={styles.userKeySection}>
             <Text style={styles.userKeyLabel}>Clave Usuario</Text>
-            <Text style={styles.userKey}>{getUserCode()}</Text>
+            <Text style={styles.userKey}>1202</Text>
           </View>
           
           <View style={styles.dateSection}>
-            <Text style={styles.dateText}>{getCurrentDate()}</Text>
+            <Text style={styles.dateText}>{getCurrentDateSpanish()}</Text>
           </View>
         </View>
 
-        {/* Tabla principal */}
-        <View style={styles.table}>
-          {/* Header principal */}
-          <View style={styles.tableHeader}>
-            <View style={styles.colDia}>
-              <Text style={styles.cellHeader}>Día</Text>
-            </View>
-            <View style={styles.colFecha}>
-              <Text style={styles.cellHeader}>Fecha</Text>
-            </View>
-            <View style={styles.spacerCol}>
-              <Text style={styles.cellHeader}></Text>
-            </View>
-            <View style={styles.colNumber}>
-              <Text style={styles.cellHeader}>1</Text>
-            </View>
-            <View style={styles.colNumber}>
-              <Text style={styles.cellHeader}>2</Text>
-            </View>
-            <View style={styles.colNumber}>
-              <Text style={styles.cellHeader}>3</Text>
-            </View>
-            <View style={styles.colNumber}>
-              <Text style={styles.cellHeader}>4</Text>
-            </View>
-            <View style={styles.colNumber}>
-              <Text style={styles.cellHeader}>5</Text>
-            </View>
-            <View style={styles.colNumber}>
-              <Text style={styles.cellHeader}>6</Text>
-            </View>
-            <View style={styles.colHorasTotal}>
-              <Text style={styles.cellHeader}>Horas</Text>
-            </View>
-            <View style={styles.colHHmm}>
-              <Text style={styles.cellHeader}>HH:mm</Text>
-            </View>
-          </View>
+        {/* Contenido principal */}
+        {Object.entries(registrosAgrupados).map(([nombreEmpleado, registrosEmpleado], empleadoIndex) => (
+          <View key={empleadoIndex}>
+            {/* Mostrar nombre del empleado solo si hay múltiples */}
+            {esMultipleEmpleados && (
+              <View style={styles.employeeSection}>
+                <Text style={styles.employeeSectionTitle}>
+                  {nombreEmpleado}
+                </Text>
+              </View>
+            )}
 
-          {/* Subheader con E y S */}
-          <View style={styles.numberHeader}>
-            <View style={styles.colDia}>
-              <Text style={styles.cellHeader}></Text>
-            </View>
-            <View style={styles.colFecha}>
-              <Text style={styles.cellHeader}></Text>
-            </View>
-            <View style={styles.spacerCol}>
-              <Text style={styles.cellHeader}></Text>
-            </View>
-            <View style={styles.colHora}>
-              <Text style={styles.cellHeader}>E</Text>
-            </View>
-            <View style={styles.colHora}>
-              <Text style={styles.cellHeader}>S</Text>
-            </View>
-            <View style={styles.colHora}>
-              <Text style={styles.cellHeader}>E</Text>
-            </View>
-            <View style={styles.colHora}>
-              <Text style={styles.cellHeader}>S</Text>
-            </View>
-            <View style={styles.colHora}>
-              <Text style={styles.cellHeader}>E</Text>
-            </View>
-            <View style={styles.colHora}>
-              <Text style={styles.cellHeader}>S</Text>
-            </View>
-            <View style={styles.colHora}>
-              <Text style={styles.cellHeader}>E</Text>
-            </View>
-            <View style={styles.colHora}>
-              <Text style={styles.cellHeader}>S</Text>
-            </View>
-            <View style={styles.colHora}>
-              <Text style={styles.cellHeader}>E</Text>
-            </View>
-            <View style={styles.colHora}>
-              <Text style={styles.cellHeader}>S</Text>
-            </View>
-            <View style={styles.colHora}>
-              <Text style={styles.cellHeader}>E</Text>
-            </View>
-            <View style={styles.colHora}>
-              <Text style={styles.cellHeader}>S</Text>
-            </View>
-            <View style={styles.colHorasTotal}>
-              <Text style={styles.cellHeader}></Text>
-            </View>
-            <View style={styles.colHHmm}>
-              <Text style={styles.cellHeader}></Text>
-            </View>
-          </View>
+            {/* Tabla */}
+            <View style={styles.table}>
+              {/* Header de la tabla */}
+              <View style={styles.tableRow}>
+                <View style={styles.tableColHeader}>
+                  <Text style={styles.tableCellHeader}>Fecha</Text>
+                </View>
+                <View style={styles.tableColHeader}>
+                  <Text style={styles.tableCellHeader}>Día</Text>
+                </View>
+                <View style={styles.tableColHeader}>
+                  <Text style={styles.tableCellHeader}>H1</Text>
+                </View>
+                <View style={styles.tableColHeader}>
+                  <Text style={styles.tableCellHeader}>H2</Text>
+                </View>
+                <View style={styles.tableColHeader}>
+                  <Text style={styles.tableCellHeader}>H3</Text>
+                </View>
+                <View style={styles.tableColHeader}>
+                  <Text style={styles.tableCellHeader}>H4</Text>
+                </View>
+                <View style={styles.tableColHeader}>
+                  <Text style={styles.tableCellHeader}>H5</Text>
+                </View>
+                <View style={styles.tableColHeader}>
+                  <Text style={styles.tableCellHeader}>H6</Text>
+                </View>
+                <View style={styles.tableColHeader}>
+                  <Text style={styles.tableCellHeader}>H7</Text>
+                </View>
+                <View style={styles.tableColHeader}>
+                  <Text style={styles.tableCellHeader}>H8</Text>
+                </View>
+                <View style={styles.tableColHeader}>
+                  <Text style={styles.tableCellHeader}>Total</Text>
+                </View>
+              </View>
 
-          {/* Filas de datos */}
-          {registros.map((registro, index) => (
-            <View key={index} style={styles.tableRow}>
-              <View style={styles.colDia}>
-                <Text style={styles.cellCenter}>{getDayOfWeek(registro.fecha)}</Text>
-              </View>
-              <View style={styles.colFecha}>
-                <Text style={styles.cellCenter}>{formatDate(registro.fecha)}</Text>
-              </View>
-              <View style={styles.spacerCol}>
-                <Text style={styles.cellCenter}></Text>
-              </View>
-              
-              {/* Horas de entrada y salida */}
-              <View style={styles.colHora}>
-                <Text style={styles.cellCenter}>{registro.h01 || ''}</Text>
-              </View>
-              <View style={styles.colHora}>
-                <Text style={styles.cellCenter}>{registro.h02 || ''}</Text>
-              </View>
-              <View style={styles.colHora}>
-                <Text style={styles.cellCenter}>{registro.h03 || ''}</Text>
-              </View>
-              <View style={styles.colHora}>
-                <Text style={styles.cellCenter}>{registro.h04 || ''}</Text>
-              </View>
-              <View style={styles.colHora}>
-                <Text style={styles.cellCenter}>{registro.h05 || ''}</Text>
-              </View>
-              <View style={styles.colHora}>
-                <Text style={styles.cellCenter}>{registro.h06 || ''}</Text>
-              </View>
-              <View style={styles.colHora}>
-                <Text style={styles.cellCenter}>{registro.h07 || ''}</Text>
-              </View>
-              <View style={styles.colHora}>
-                <Text style={styles.cellCenter}>{registro.h08 || ''}</Text>
-              </View>
-              <View style={styles.colHora}>
-                <Text style={styles.cellCenter}></Text>
-              </View>
-              <View style={styles.colHora}>
-                <Text style={styles.cellCenter}></Text>
-              </View>
-              <View style={styles.colHora}>
-                <Text style={styles.cellCenter}></Text>
-              </View>
-              <View style={styles.colHora}>
-                <Text style={styles.cellCenter}></Text>
-              </View>
-              
-              {/* Total de horas */}
-              <View style={styles.colHorasTotal}>
-                <Text style={styles.cellCenter}>{registro.total?.split(':')[0] || '0'}.{registro.total?.split(':')[1] || '00'}</Text>
-              </View>
-              <View style={styles.colHHmm}>
-                <Text style={styles.cellCenter}>{formatTotalHours(registro.total)}</Text>
-              </View>
+              {/* Filas de datos */}
+              {registrosEmpleado.map((registro, index) => (
+                <View key={index} style={styles.tableRow}>
+                  <View style={styles.tableCol}>
+                    <Text style={styles.tableCell}>
+                      {registro.fecha.toLocaleDateString('es-ES')}
+                    </Text>
+                  </View>
+                  <View style={styles.tableCol}>
+                    <Text style={styles.tableCell}>{registro.dia}</Text>
+                  </View>
+                  <View style={styles.tableCol}>
+                    <Text style={styles.tableCell}>{registro.h01 || ''}</Text>
+                  </View>
+                  <View style={styles.tableCol}>
+                    <Text style={styles.tableCell}>{registro.h02 || ''}</Text>
+                  </View>
+                  <View style={styles.tableCol}>
+                    <Text style={styles.tableCell}>{registro.h03 || ''}</Text>
+                  </View>
+                  <View style={styles.tableCol}>
+                    <Text style={styles.tableCell}>{registro.h04 || ''}</Text>
+                  </View>
+                  <View style={styles.tableCol}>
+                    <Text style={styles.tableCell}>{registro.h05 || ''}</Text>
+                  </View>
+                  <View style={styles.tableCol}>
+                    <Text style={styles.tableCell}>{registro.h06 || ''}</Text>
+                  </View>
+                  <View style={styles.tableCol}>
+                    <Text style={styles.tableCell}>{registro.h07 || ''}</Text>
+                  </View>
+                  <View style={styles.tableCol}>
+                    <Text style={styles.tableCell}>{registro.h08 || ''}</Text>
+                  </View>
+                  <View style={styles.tableCol}>
+                    <Text style={styles.tableCell}>{registro.total}</Text>
+                  </View>
+                </View>
+              ))}
             </View>
-          ))}
-        </View>
+
+            {/* Sección de totales */}
+            <View style={styles.totalSection}>
+              <Text style={styles.totalText}>
+                TOTAL DE HORAS: {calcularTotalHoras(registrosEmpleado)}
+              </Text>
+              <Text style={styles.totalText}>
+                DÍAS TRABAJADOS: {registrosEmpleado.length}
+              </Text>
+            </View>
+
+            {/* Espacio entre empleados */}
+            {esMultipleEmpleados && empleadoIndex < Object.keys(registrosAgrupados).length - 1 && (
+              <View style={{ marginBottom: 20 }} />
+            )}
+          </View>
+        ))}
       </Page>
     </Document>
   );
 };
 
-// Componente principal PDFInterface
-const PDFInterface = ({ registros, onBack }) => {
-  const [empleadoSeleccionado, setEmpleadoSeleccionado] = useState("");
-  const [registrosFiltrados, setRegistrosFiltrados] = useState([]);
-  const [empleadoData, setEmpleadoData] = useState(null);
+// Componente principal PDFInterface simplificado
+const PDFInterface = ({ savedConfiguration, onBack }) => {
+  const { registros, empleado, fechaInicio, fechaFin } = savedConfiguration;
 
-  const handleEmpleadoChange = (e) => {
-    const nombre = e.target.value;
-    setEmpleadoSeleccionado(nombre);
-    
-    if (!nombre) {
-      setRegistrosFiltrados([]);
-      setEmpleadoData(null);
-      return;
-    }
-
-    // Buscar el empleado completo
-    const empleado = empleados.find(emp => emp.nombre === nombre);
+  // Función para obtener el nombre del empleado para el filename
+  const getEmpleadoParaFilename = () => {
     if (empleado) {
-      setEmpleadoData(empleado);
-      setRegistrosFiltrados(empleado.registros);
+      return empleado.replace(/\s+/g, '_').substring(0, 20);
     }
+    
+    const empleadosUnicos = [...new Set(registros.map(reg => reg.empleado))];
+    if (empleadosUnicos.length === 1) {
+      return empleadosUnicos[0].replace(/\s+/g, '_').substring(0, 20);
+    }
+    
+    return 'todos';
   };
 
-  // Obtener lista única de empleados
-  const empleadosDisponibles = empleados;
-
   return (
-    <CContainer className="py-3">
+    <CContainer className="py-3" fluid>
       <CCard className="shadow-lg border-0">
         <CCardHeader className="text-white" style={{ background: 'linear-gradient(90deg, #2193b0, #6dd5ed)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h3 className="m-0">REPORTE DE MARCACIONES - EMPLEADO</h3>
+            <h3 className="m-0">VISTA PREVIA PDF - MARCACIONES</h3>
             <CButton 
               color="light" 
               onClick={onBack}
@@ -444,120 +355,82 @@ const PDFInterface = ({ registros, onBack }) => {
         </CCardHeader>
         <CCardBody style={{ backgroundColor: '#f8f9fa' }}>
           
-          {/* Control de selección de empleado */}
-          <CRow className="mb-4">
-            <CCol md={8}>
-              <label><strong>Seleccionar Empleado para Generar Reporte Individual</strong></label>
-              <CFormSelect 
-                value={empleadoSeleccionado} 
-                onChange={handleEmpleadoChange}
-              >
-                <option value="">Seleccione un empleado...</option>
-                {empleadosDisponibles.map((empleado, index) => (
-                  <option key={index} value={empleado.nombre}>
-                    {empleado.nombre}
-                  </option>
-                ))}
-              </CFormSelect>
-            </CCol>
-            <CCol md={4} className="d-flex align-items-end">
-              {empleadoSeleccionado && (
-                <PDFDownloadLink
-                  document={
-                    <PDFDocument 
-                      empleado={empleadoData}
-                      registros={registrosFiltrados} 
-                    />
-                  }
-                  fileName={`reporte_${empleadoSeleccionado.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`}
-                >
-                  {({ blob, url, loading, error }) =>
-                    <CButton 
-                      color="success"
-                      disabled={loading}
-                      style={{ 
-                        width: '100%',
-                        background: 'linear-gradient(90deg, #28a745, #20c997)',
-                        border: 'none'
-                      }}
-                    >
-                      {loading ? 'Generando...' : '📥 Descargar PDF'}
-                    </CButton>
-                  }
-                </PDFDownloadLink>
-              )}
+          {/* Información de la configuración actual */}
+          <CRow className="mb-3">
+            <CCol className="text-center">
+              <div style={{ 
+                backgroundColor: '#e3f2fd', 
+                padding: '10px', 
+                borderRadius: '8px',
+                marginBottom: '15px'
+              }}>
+                <strong style={{ color: '#2193b0' }}>Configuración del Reporte:</strong>
+                <br />
+                <span style={{ fontSize: '14px' }}>
+                  Empleado: {empleado || "Todos los empleados"} | 
+                  Registros: {registros.length} | 
+                  Período: {fechaInicio && fechaFin ? 
+                    `${new Date(fechaInicio).toLocaleDateString('es-ES')} - ${new Date(fechaFin).toLocaleDateString('es-ES')}` : 
+                    "Todas las fechas"}
+                </span>
+              </div>
             </CCol>
           </CRow>
 
-          {/* Información del empleado seleccionado */}
-          {empleadoSeleccionado && (
-            <CRow className="mb-3">
-              <CCol>
-                <div style={{ 
-                  backgroundColor: '#e9ecef',
-                  padding: '15px',
-                  borderRadius: '8px',
-                  border: '1px solid #dee2e6'
-                }}>
-                  <h5 style={{ color: '#495057', marginBottom: '10px' }}>
-                    📋 Empleado Seleccionado
-                  </h5>
-                  <p style={{ marginBottom: '5px', fontSize: '14px' }}>
-                    <strong>Nombre:</strong> {empleadoData?.nombre}
-                  </p>
-                  <p style={{ marginBottom: '5px', fontSize: '14px' }}>
-                    <strong>Total de Registros:</strong> {registrosFiltrados.length}
-                  </p>
-                  <p style={{ marginBottom: '0', fontSize: '14px' }}>
-                    <strong>Período:</strong> {
-                      registrosFiltrados.length > 0 
-                        ? `${formatDate(registrosFiltrados[0].fecha)} - ${formatDate(registrosFiltrados[registrosFiltrados.length - 1].fecha)}`
-                        : 'Sin registros'
-                    }
-                  </p>
-                </div>
-              </CCol>
-            </CRow>
-          )}
+          {/* Botón de descarga */}
+          <CRow className="mb-3">
+            <CCol className="text-center">
+              <PDFDownloadLink
+                document={
+                  <PDFDocument 
+                    registros={registros} 
+                    empleadoSeleccionado={empleado}
+                    fechaInicio={fechaInicio}
+                    fechaFin={fechaFin}
+                  />
+                }
+                fileName={`marcaciones_${getEmpleadoParaFilename()}_${new Date().toLocaleDateString('es-ES').replace(/\//g, '-')}.pdf`}
+              >
+                {({ blob, url, loading, error }) =>
+                  <CButton 
+                    color="success"
+                    disabled={loading}
+                    style={{ 
+                      background: 'linear-gradient(90deg, #28a745, #20c997)',
+                      border: 'none',
+                      fontSize: '16px',
+                      padding: '12px 30px'
+                    }}
+                  >
+                    {loading ? 'Generando PDF...' : 'Descargar PDF'}
+                  </CButton>
+                }
+              </PDFDownloadLink>
+            </CCol>
+          </CRow>
 
           {/* Vista previa del PDF */}
-          {empleadoSeleccionado && registrosFiltrados.length > 0 ? (
-            <div style={{ 
-              height: '700px', 
-              border: '2px solid #dee2e6', 
-              borderRadius: '8px',
-              overflow: 'hidden',
-              backgroundColor: '#fff'
-            }}>
-              <PDFViewer 
-                style={{ 
-                  width: '100%', 
-                  height: '100%',
-                  border: 'none'
-                }}
-              >
-                <PDFDocument 
-                  empleado={empleadoData}
-                  registros={registrosFiltrados} 
-                />
-              </PDFViewer>
-            </div>
-          ) : (
-            <div style={{ 
-              height: '400px', 
-              border: '2px dashed #dee2e6', 
-              borderRadius: '8px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: '#f8f9fa'
-            }}>
-              <div style={{ textAlign: 'center', color: '#6c757d' }}>
-                <h4>👤 Selecciona un empleado</h4>
-                <p>Elige un empleado de la lista para ver la vista previa de su reporte de marcaciones</p>
-              </div>
-            </div>
-          )}
+          <div style={{ 
+            height: '600px', 
+            border: '2px solid #dee2e6', 
+            borderRadius: '8px',
+            overflow: 'hidden'
+          }}>
+            <PDFViewer 
+              style={{ 
+                width: '100%', 
+                height: '100%',
+                border: 'none'
+              }}
+            >
+              <PDFDocument 
+                registros={registros} 
+                empleadoSeleccionado={empleado}
+                fechaInicio={fechaInicio}
+                fechaFin={fechaFin}
+              />
+            </PDFViewer>
+          </div>
         </CCardBody>
       </CCard>
     </CContainer>
