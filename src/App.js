@@ -1,5 +1,5 @@
 import './App.css';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import {
   CButton,
   CCard,
@@ -11,31 +11,12 @@ import {
   CCol,
 } from '@coreui/react';
 import PDFInterface from './PDFInterface';
-import { empleados } from './empleados';
 
 function App() {
-  // Adaptar a la nueva estructura de datos
-  const allRegistros = empleados.map(emp => ({
-    fecha: new Date(emp.fecha.split('/').reverse().join('/')), // Convertir dd/mm/yyyy a Date
-    dia: emp.DiaSemana,
-    h01: emp.H01,
-    h02: emp.H02,
-    h03: emp.H03,
-    h04: emp.H04,
-    h05: emp.H05,
-    h06: emp.H06,
-    h07: emp.H07,
-    h08: emp.H08,
-    total: emp.totHoraMin,
-    totalDecimal: emp.total,
-    empleado: emp.Empleado
-  }));
-
-  const [registro, setRegistro] = useState(allRegistros);
+  const [allRegistros, setAllRegistros] = useState([]);
+  const [registro, setRegistro] = useState([]);
   const [empleadoSeleccionado, setEmpleadoSeleccionado] = useState("");
   const [showPDFInterface, setShowPDFInterface] = useState(false);
-  
-  // Estados para la configuración guardada
   const [configurationSaved, setConfigurationSaved] = useState(false);
   const [savedConfiguration, setSavedConfiguration] = useState({
     registros: [],
@@ -43,47 +24,60 @@ function App() {
     fechaInicio: "",
     fechaFin: ""
   });
-  
+
   const fechaI = useRef();
   const fechaF = useRef();
 
-  // Nueva función unificada de filtrado
+  // 🔹 Obtener empleados desde backend
+  useEffect(() => {
+    fetch("http://localhost:4000") // URL de tu backend
+      .then(res => res.json())
+      .then(data => {
+        const registrosAdaptados = data.map(emp => ({
+          fecha: new Date(emp.fecha), 
+          dia: emp.DiaSemana,
+          h01: emp.H01,
+          h02: emp.H02,
+          h03: emp.H03,
+          h04: emp.H04,
+          h05: emp.H05,
+          h06: emp.H06,
+          h07: emp.H07,
+          h08: emp.H08,
+          total: emp.totHoraMin,
+          totalDecimal: emp.total,
+          empleado: emp.Empleado
+        }));
+        setAllRegistros(registrosAdaptados);
+        setRegistro(registrosAdaptados);
+      })
+      .catch(err => console.error("Error al cargar empleados:", err));
+  }, []);
+
+  // 🔹 Funciones de filtrado (igual que antes)
   const applyFilters = () => {
     let filtrados = allRegistros;
-    
-    // Aplicar filtro por empleado si está seleccionado
     if (empleadoSeleccionado) {
       filtrados = filtrados.filter(reg => reg.empleado === empleadoSeleccionado);
     }
-    
-    // Aplicar filtro por fechas si están definidas
     const startValue = fechaI.current?.value;
     const endValue = fechaF.current?.value;
-    
     if (startValue && endValue) {
       const start = new Date(startValue);
       const end = new Date(endValue);
-      filtrados = filtrados.filter(registro => {
-        return registro.fecha >= start && registro.fecha <= end;
-      });
+      filtrados = filtrados.filter(r => r.fecha >= start && r.fecha <= end);
     }
-    
     setRegistro(filtrados);
   };
 
   const handleChange = (e) => {
-    const nombre = e.target.value;
-    setEmpleadoSeleccionado(nombre);
+    setEmpleadoSeleccionado(e.target.value);
     setConfigurationSaved(false);
-    
-    // Aplicar filtros combinados
     setTimeout(() => applyFilters(), 0);
   };
 
   const handleFilterByDate = () => {
     setConfigurationSaved(false);
-    
-    // Aplicar filtros combinados
     applyFilters();
   };
 
@@ -95,11 +89,9 @@ function App() {
     setConfigurationSaved(false);
   };
 
-  // Nueva función para guardar la configuración
   const handleSaveConfiguration = () => {
     const startValue = fechaI.current?.value || "";
     const endValue = fechaF.current?.value || "";
-    
     setSavedConfiguration({
       registros: registro,
       empleado: empleadoSeleccionado,
@@ -109,16 +101,10 @@ function App() {
     setConfigurationSaved(true);
   };
 
-  // Obtener lista única de empleados
   const empleadosUnicos = [...new Set(allRegistros.map(reg => reg.empleado))].sort();
 
-  const handleShowPDFInterface = () => {
-    setShowPDFInterface(true);
-  };
-
-  const handleBackToMain = () => {
-    setShowPDFInterface(false);
-  };
+  const handleShowPDFInterface = () => setShowPDFInterface(true);
+  const handleBackToMain = () => setShowPDFInterface(false);
 
   if (showPDFInterface) {
     return (
@@ -128,10 +114,8 @@ function App() {
       />
     );
   }
-const selectedEmployee = empleados.find(emp => emp.nombre === empleadoSeleccionado);
 
   return (
-    
     <CContainer className="py-5">
       <CCard className="shadow-lg border-0">
         <CCardHeader className="text-white" style={{ background: 'linear-gradient(90deg, #2193b0, #6dd5ed)' }}>
