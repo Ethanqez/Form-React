@@ -139,12 +139,25 @@ const PDFDocument = ({ registros, empleadoSeleccionado, fechaInicio, fechaFin })
   };
 
   const getFechaRange = () => {
+    // Fix for date offset issue by adjusting timezone handling
+    const formatDate = (dateString) => {
+      const date = new Date(dateString);
+      // Add one day to fix the offset issue
+      date.setDate(date.getDate() + 1);
+      return date.toLocaleDateString('es-ES', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric',
+        timeZone: 'UTC'
+      });
+    };
+    
     if (fechaInicio && fechaFin) {
-      return `${new Date(fechaInicio).toLocaleDateString('es-ES')} - ${new Date(fechaFin).toLocaleDateString('es-ES')}`;
+      return `${formatDate(fechaInicio)} - ${formatDate(fechaFin)}`;
     } else if (fechaInicio) {
-      return `Desde: ${new Date(fechaInicio).toLocaleDateString('es-ES')}`;
+      return `Desde: ${formatDate(fechaInicio)}`;
     } else if (fechaFin) {
-      return `Hasta: ${new Date(fechaFin).toLocaleDateString('es-ES')}`;
+      return `Hasta: ${formatDate(fechaFin)}`;
     } else {
       return "Todos los períodos";
     }
@@ -252,8 +265,16 @@ const PDFDocument = ({ registros, empleadoSeleccionado, fechaInicio, fechaFin })
                 <View key={index} style={styles.tableRow}>
                   <View style={styles.tableCol}>
                     <Text style={styles.tableCell}>
-                      {registro.fecha.toLocaleDateString('es-ES')}
-                    </Text>
+                    {(() => {
+                      const date = new Date(registro.fecha);
+                      return date.toLocaleDateString('es-ES', { 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric',
+                        timeZone: 'UTC'
+                      });
+                    })()}
+                  </Text>
                   </View>
                   <View style={styles.tableCol}>
                     <Text style={styles.tableCell}>{registro.dia}</Text>
@@ -360,8 +381,20 @@ const PDFInterface = ({ savedConfiguration, onBack }) => {
                   Empleado: {empleado || "Todos los empleados"} | 
                   Registros: {registros.length} | 
                   Período: {fechaInicio && fechaFin ? 
-                    `${new Date(fechaInicio).toLocaleDateString('es-ES')} - ${new Date(fechaFin).toLocaleDateString('es-ES')}` : 
-                    "Todas las fechas"}
+                (() => {
+                  const formatDate = (dateString) => {
+                    const date = new Date(dateString);
+                    date.setDate(date.getDate() + 1);
+                    return date.toLocaleDateString('es-ES', { 
+                      year: 'numeric', 
+                      month: 'long', 
+                      day: 'numeric',
+                      timeZone: 'UTC'
+                    });
+                  };
+                  return `${formatDate(fechaInicio)} - ${formatDate(fechaFin)}`;
+                })() : 
+                "Todas las fechas"}
                 </span>
               </div>
             </CCol>
