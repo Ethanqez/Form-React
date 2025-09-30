@@ -5,6 +5,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import db from './db.js';
 import routerIndex from './routers/index.router.js';
+import cors from 'cors';
 
 // Get directory name in ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -12,6 +13,8 @@ const __dirname = path.dirname(__filename);
 
 db();
 const app = express();
+
+app.use(cors());
 
 // Middleware for parsing JSON
 app.use(express.json());
