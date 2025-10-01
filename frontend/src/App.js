@@ -30,7 +30,7 @@ function App() {
 
   // 🔹 Obtener empleados desde backend
   useEffect(() => {
-    fetch("http://localhost:3030/api/empleados") // URL de tu backend
+    fetch("http://172.16.0.200:3030/api/empleados") // URL de tu backend
       .then(res => res.json())
       .then(data => {
         const registrosAdaptados = data.map(emp => ({

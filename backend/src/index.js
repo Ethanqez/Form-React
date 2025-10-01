@@ -3,45 +3,36 @@ dotenv.config();
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import db from './db.js';
+//import db from './db.js';
 import routerIndex from './routers/index.router.js';
-import cors from 'cors';
-import { MongoClient, ServerApiVersion } from 'mongodb';
+import cors from 'cors';   //20252212
 
-const uri = "mongodb+srv://admin:20232212pass@cluster0.pjjcrkx.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
-// Create a MongoClient with a MongoClientOptions object to set the Stable API version
-const client = new MongoClient(uri, {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
-  }
-});
-async function run() {
-  try {
-    // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
-    // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
-  } finally {
-    // Ensures that the client will close when you finish/error
-    await client.close();
-  }
-}
-run().catch(console.dir);
-
+import mongoose from 'mongoose';
 
 
 // Get directory name in ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-db();
+//db();
 const app = express();
-
 app.use(cors());
+const uri = process.env.MONGODB_URI;
 
+mongoose.connect(uri)
+  .then(() => console.log('✅ Conectado a MongoDB'))
+  .catch(err => console.error('❌ Error:', err));
+
+// Ejemplo de ruta API
+app.get('/', async (req, res) => {
+  try {
+    // Aquí harías tus consultas a MongoDB
+    const empleados = await MiModelo.find();
+    res.json(empleados);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 // Middleware for parsing JSON
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
