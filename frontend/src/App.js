@@ -28,9 +28,9 @@ function App() {
   const fechaI = useRef();
   const fechaF = useRef();
 
-  // 🔹 Obtener empleados desde backend
+  // Obtener empleados desde backend
   useEffect(() => {
-    fetch("http://172.16.0.200:3030/api/empleados") // URL de tu backend
+    fetch("http://172.16.0.200:3030/api/empleados") 
       .then(res => res.json())
       .then(data => {
         const registrosAdaptados = data.map(emp => ({
@@ -54,27 +54,34 @@ function App() {
       .catch(err => console.error("Error al cargar empleados:", err));
   }, []);
 
-  // 🔹 Funciones de filtrado (igual que antes)
-  const applyFilters = () => {
-    let filtrados = allRegistros;
-    if (empleadoSeleccionado) {
-      filtrados = filtrados.filter(reg => reg.empleado === empleadoSeleccionado);
-    }
-    const startValue = fechaI.current?.value;
-    const endValue = fechaF.current?.value;
-    if (startValue && endValue) {
-      const start = new Date(startValue);
-      const end = new Date(endValue);
-      filtrados = filtrados.filter(r => r.fecha >= start && r.fecha <= end);
-    }
-    setRegistro(filtrados);
-  };
+
+  const applyFilters = (empleadoOverride = null) => {
+  let filtrados = allRegistros;
+  
+  const empleadoAFiltrar = empleadoOverride !== null ? empleadoOverride : empleadoSeleccionado;
+  
+  if (empleadoAFiltrar) {
+    filtrados = filtrados.filter(reg => reg.empleado === empleadoAFiltrar);
+  }
+  
+  const startValue = fechaI.current?.value;
+  const endValue = fechaF.current?.value;
+  
+  if (startValue && endValue) {
+    const start = new Date(startValue);
+    const end = new Date(endValue);
+    filtrados = filtrados.filter(r => r.fecha >= start && r.fecha <= end);
+  }
+  
+  setRegistro(filtrados);
+};
 
   const handleChange = (e) => {
-    setEmpleadoSeleccionado(e.target.value);
-    setConfigurationSaved(false);
-    setTimeout(() => applyFilters(), 0);
-  };
+  const nuevoEmpleado = e.target.value;
+  setEmpleadoSeleccionado(nuevoEmpleado);
+  setConfigurationSaved(false);
+  applyFilters(nuevoEmpleado); // Pasar el valor directamente
+};
 
   const handleFilterByDate = () => {
     setConfigurationSaved(false);
@@ -180,7 +187,7 @@ function App() {
                 </option>
                 {empleadosUnicos.map((empleado, index) => (
                   <option key={index} value={empleado}>
-                    {empleado}
+                    {empleado} 
                   </option>
                 ))}
               </CFormSelect>
